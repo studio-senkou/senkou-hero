@@ -14,8 +14,9 @@ const urbanist = Urbanist({
 });
 
 export const metadata: Metadata = {
-  title: "Hero",
-  description: "",
+  title: "Hero - You new favorite place to find products",
+  description:
+    "Hero is a platform that helps you find the best products for your needs.",
 };
 
 export default function RootLayout({
