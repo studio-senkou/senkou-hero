@@ -1,15 +1,29 @@
 'use client'
 
-import { Search, ShoppingCart, Menu, X } from 'lucide-react'
-import { Button } from './button'
 import Image from 'next/image'
-import { NAVIGATION_ITEMS } from '@hero/constants/navigation'
-import { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Search, ShoppingCart, Menu, X } from 'lucide-react'
 
-const Navbar = () => {
+import { NAVIGATION_ITEMS } from '@hero/constants/navigation'
+import { cn } from '@hero/lib/utils'
+import { Button } from './button'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from './breadcrumb'
+
+interface NavbarProps extends React.HTMLAttributes<HTMLDivElement> {
+  breadcrumbLabel?: string
+}
+
+const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
   const [hasScrolled, setHasScrolled] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
@@ -30,7 +44,10 @@ const Navbar = () => {
         <li key={item.label}>
           <Link
             href={item.href}
-            className="text-gray-800 hover:text-[#00B207] transition-colors duration-300"
+            className={cn(
+              'text-gray-800 hover:text-[#00B207] transition-colors duration-300',
+              pathname === item.href && 'text-[#00B207]',
+            )}
             onClick={onClick}
           >
             {item.label}
@@ -49,31 +66,39 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full p-2 z-50 transition-all duration-500 ease-in-out
-        ${
-          hasScrolled
-            ? 'border-b border-gray-100 bg-white/80 backdrop-blur-md'
-            : 'border-b border-transparent bg-white'
-        }`}
+      className={cn(
+        'fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-in-out',
+        hasScrolled
+          ? 'border-b border-gray-100 bg-white/80 backdrop-blur-md'
+          : 'border-b border-transparent bg-white',
+        className,
+      )}
+      {...props}
     >
-      <div className="flex justify-between items-center lg:max-w-3/4 mx-auto">
+      <div className="flex justify-between items-center lg:max-w-3/4 mx-auto p-2">
         <div>{Brand}</div>
         <div className="hidden md:flex items-center gap-6">
           <NavLinks />
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" className="hidden md:inline-flex">
-            <Search />
-          </Button>
-          <Link href="/cart" className="hidden md:inline-flex">
-            <ShoppingCart size={16} />
-          </Link>
-          <Button variant="ghost" className="md:hidden">
-            <Search />
-          </Button>
-          <Link href="/cart" className="md:hidden">
-            <ShoppingCart size={16} />
-          </Link>
+          {['md', ''].map((bp, i) => (
+            <Button
+              key={`search-${bp}-${i}`}
+              variant="ghost"
+              className={bp ? `hidden ${bp}:inline-flex` : `${bp}hidden`}
+            >
+              <Search />
+            </Button>
+          ))}
+          {['md', ''].map((bp, i) => (
+            <Link
+              key={`cart-${bp}-${i}`}
+              href="/cart"
+              className={bp ? `hidden ${bp}:inline-flex` : `${bp}hidden`}
+            >
+              <ShoppingCart size={16} />
+            </Link>
+          ))}
           <Button
             variant="ghost"
             className="md:hidden"
@@ -106,16 +131,7 @@ const Navbar = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-4">
-                {pathname === '/' ? (
-                  <Image
-                    src="/hero-logo-c1.png"
-                    alt="Hero Logo"
-                    width={48}
-                    height={10}
-                  />
-                ) : (
-                  <h1 className="text-lg font-semibold">Hero</h1>
-                )}
+                {Brand}
                 <Button
                   variant="ghost"
                   onClick={() => setSidebarOpen(false)}
@@ -129,6 +145,40 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Breadcrumb */}
+      {pathname !== '/' && (
+        <div className="p-2 bg-black text-white">
+          <div className="flex items-center lg:max-w-3/4 mx-auto">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink
+                    href="/"
+                    className="text-xs text-white hover:text-neutral-200"
+                  >
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-xs text-[#00B207]">
+                    {breadcrumbLabel ||
+                      pathname
+                        .split('/')
+                        .filter(Boolean)
+                        .map(
+                          (segment) =>
+                            segment.charAt(0).toUpperCase() + segment.slice(1),
+                        )
+                        .join(' / ')}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }

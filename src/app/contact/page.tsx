@@ -1,13 +1,82 @@
-import { Navbar } from "@hero/components/ui/navbar";
+import { Footer } from '@hero/components/footer'
+import { Button } from '@hero/components/ui/button'
+import { Input } from '@hero/components/ui/input'
+import { Navbar } from '@hero/components/ui/navbar'
+import { Textarea } from '@hero/components/ui/textarea'
+import Image from 'next/image'
 
 export default function Contact() {
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen">
+    <main className="flex flex-col items-center mt-20 lg:mt-24">
       <Navbar />
-      <h1 className="text-4xl font-bold">Contact Us</h1>
-      <p className="mt-4 text-lg text-center">
-        If you have any questions or inquiries, feel free to reach out to us.
-      </p>
-    </div>
-  );
+      <div className="w-full max-w-[90vw] md:max-w-3/4 px-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-center md:text-left">
+          Can’t Help Hearing from You!
+        </h1>
+        <p className="mt-4 text-base md:text-lg text-gray-700 text-center md:text-left">
+          We would be glad if you want to take your time to fill out this
+          following form and share any inquiries about the site. You can also
+          contact us via call or email using the information below.
+        </p>
+      </div>
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-8 mt-8 md:mt-12 w-full max-w-[90vw] md:max-w-3/4 mb-8 md:mb-12 px-4">
+        <div className="flex flex-col items-center justify-center gap-6 flex-1 md:max-w-2xl p-4 md:p-8 shadow-sm rounded-xl bg-white h-full">
+          <div className="flex flex-col items-center">
+            <Image
+              src="/services/service-xx7.svg"
+              alt="Contact Us"
+              width={48}
+              height={48}
+            />
+            <p className="mt-4 text-base md:text-lg text-gray-700 text-center">
+              Hero@gmail.com
+            </p>
+          </div>
+          <hr className="border-t border-neutral-200 w-full" />
+          <div className="flex flex-col items-center">
+            <Image
+              src="/services/phone-xx8.svg"
+              alt="Contact Us"
+              width={48}
+              height={48}
+            />
+            <div className="flex flex-col gap-1 items-center mt-4">
+              <p className="text-base md:text-lg text-center">(219) 555-0114</p>
+              <p className="text-base md:text-lg text-center">
+                Monday - Friday
+              </p>
+              <p className="text-base md:text-lg text-center">
+                9:00 - 5:00 GMT
+              </p>
+            </div>
+          </div>
+        </div>
+        <form className="flex flex-col gap-4 justify-start flex-3 w-full p-4 md:p-8 shadow-sm rounded-xl bg-white h-full">
+          <div className="flex flex-col md:flex-row gap-4">
+            <Input
+              placeholder="Type your full name here..."
+              className="w-full p-6"
+            />
+            <Input
+              placeholder="Type your email here..."
+              className="w-full p-6"
+            />
+          </div>
+          <Input
+            placeholder="Write your message here..."
+            className="w-full p-6"
+          />
+          <Textarea
+            placeholder="Write your description here..."
+            className="w-full p-6"
+            rows={4}
+          />
+          <Button className="max-w-fit rounded-full bg-[#00B207]">
+            Send Message
+          </Button>
+        </form>
+      </div>
+      <Footer />
+    </main>
+  )
 }

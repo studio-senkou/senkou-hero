@@ -3,10 +3,20 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { FOOTER_LINKS, SOCIAL_LINKS } from '@hero/constants/footer'
 import Link from 'next/link'
+import { cn } from '@hero/lib/utils'
 
-export const Footer = () => {
+export const Footer = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <footer className="flex flex-col items-center justify-center min-w-screen pb-10 bg-[#1A1A1A]">
+    <footer
+      className={cn(
+        'flex flex-col items-center justify-center min-w-screen pb-10 bg-[#1A1A1A]',
+        className,
+      )}
+      {...props}
+    >
       <section className="w-full p-8 bg-[#F2F2F2]">
         <div className="flex flex-col lg:flex-row justify-between items-center w-full lg:max-w-3/4 mx-auto gap-4 lg:gap-0">
           <div className="flex items-center gap-4 mb-6 lg:mb-0">
