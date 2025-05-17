@@ -1,7 +1,7 @@
-import Image from "next/image";
-import { Button } from "./ui/button";
-import { ArrowRight } from "lucide-react";
-import { cn } from "@hero/lib/utils";
+import Image from 'next/image'
+import { Button } from './ui/button'
+import { ArrowRight } from 'lucide-react'
+import { cn } from '@hero/lib/utils'
 
 const LandingJumbotron = ({
   className,
@@ -10,13 +10,13 @@ const LandingJumbotron = ({
   return (
     <section
       className={cn(
-        "flex flex-col md:flex-row gap-4 py-4 px-12 md:max-w-4/5 mx-auto min-h-[600px] bg-[#F0F5F1] rounded-lg",
+        'flex flex-col lg:flex-row gap-4 py-4 px-12 lg:max-w-4/5 mx-auto lg:min-h-[600px] bg-[#F0F5F1] rounded-lg',
         className,
       )}
       {...props}
     >
-      <div className="flex w-full">
-        <div className="w-full md:w-1/3 flex flex-col justify-center p-4">
+      <div className="flex flex-col-reverse lg:flex-row w-full">
+        <div className="w-full lg:w-1/3 flex flex-col justify-center p-4">
           <h6 className="uppercase text-xs font-semibold text-[#00B207]">
             Welcome To Hero
           </h6>
@@ -35,7 +35,7 @@ const LandingJumbotron = ({
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
-        <div className="w-full md:w-2/3 hidden md:flex items-center justify-center">
+        <div className="w-full lg:w-2/3 hidden lg:flex items-center justify-center">
           <Image
             src="/hero-image-ax1.png"
             alt="Buah buahan"
@@ -47,7 +47,7 @@ const LandingJumbotron = ({
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export { LandingJumbotron };
+export { LandingJumbotron }

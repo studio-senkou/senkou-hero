@@ -1,73 +1,91 @@
-"use client";
+'use client'
 
-import { cn } from "@hero/lib/utils";
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
-import { TESTIMONIALS } from "@hero/constants/testimony";
+import { cn } from '@hero/lib/utils'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import Image from 'next/image'
+import { TESTIMONIALS } from '@hero/constants/testimony'
 
 export const Testimonials = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
-  const AUTOPLAY_INTERVAL = 10000;
-  const CARDS_PER_PAGE = 2;
+  const AUTOPLAY_INTERVAL = 10000
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [direction, setDirection] = useState(1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  // Responsive: detect mobile using window.matchMedia
+  const [isMobile, setIsMobile] = useState(false)
 
-  const totalPages = Math.ceil(TESTIMONIALS.length / CARDS_PER_PAGE);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 1023)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  const CARDS_PER_PAGE = isMobile ? 1 : 2
+
+  const [currentPage, setCurrentPage] = useState(0)
+  const [direction, setDirection] = useState(1)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  const totalPages = Math.ceil(TESTIMONIALS.length / CARDS_PER_PAGE)
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
       if (currentPage === totalPages - 1) {
-        setDirection(-1);
-        setCurrentPage(0);
+        setDirection(-1)
+        setCurrentPage(0)
       } else {
-        setDirection(1);
-        setCurrentPage((previousPage) => previousPage + 1);
+        setDirection(1)
+        setCurrentPage((previousPage) => previousPage + 1)
       }
-    }, AUTOPLAY_INTERVAL);
+    }, AUTOPLAY_INTERVAL)
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [currentPage, totalPages]);
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [currentPage, totalPages])
 
-  const startIndex = currentPage * CARDS_PER_PAGE;
+  // Reset currentPage if totalPages changes (e.g., on resize)
+  useEffect(() => {
+    setCurrentPage(0)
+  }, [CARDS_PER_PAGE])
+
+  const startIndex = currentPage * CARDS_PER_PAGE
   const currentTestimonials = TESTIMONIALS.slice(
     startIndex,
     startIndex + CARDS_PER_PAGE,
-  );
+  )
 
   const variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 80 : -80,
       opacity: 0,
       scale: 0.98,
-      filter: "blur(2px)",
+      filter: 'blur(2px)',
       transition: { duration: 0.35, ease: [0.4, 0.01, 0.165, 0.99] },
     }),
     center: {
       x: 0,
       opacity: 1,
       scale: 1,
-      filter: "blur(0px)",
+      filter: 'blur(0px)',
       transition: { duration: 0.5, ease: [0.4, 0.01, 0.165, 0.99] },
     },
     exit: (direction: number) => ({
       x: direction > 0 ? -80 : 80,
       opacity: 0,
       scale: 0.98,
-      filter: "blur(2px)",
+      filter: 'blur(2px)',
       transition: { duration: 0.35, ease: [0.4, 0.01, 0.165, 0.99] },
     }),
-  };
+  }
 
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center w-full p-8 overflow-x-hidden",
+        'flex flex-col items-center justify-center w-full lg:p-8 overflow-x-hidden',
         className,
       )}
       {...props}
@@ -78,7 +96,7 @@ export const Testimonials = ({
       <div className="flex flex-col items-center w-full">
         <div
           className="w-full flex flex-row justify-center gap-6 overflow-hidden min-h-[280px]"
-          style={{ position: "relative" }}
+          style={{ position: 'relative' }}
         >
           <AnimatePresence initial={false} custom={direction} mode="wait">
             <motion.div
@@ -89,8 +107,8 @@ export const Testimonials = ({
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ type: "tween" }}
-              style={{ width: "100%" }}
+              transition={{ type: 'tween' }}
+              style={{ width: '100%' }}
             >
               {currentTestimonials.map((testimonial, testimonialIndex) => (
                 <TestimonyCard
@@ -108,10 +126,10 @@ export const Testimonials = ({
           {Array.from({ length: totalPages }).map((_, pageIndex) => (
             <button
               key={pageIndex}
-              className={`h-2 transition-all rounded-lg cursor-pointer ${pageIndex === currentPage ? "bg-[#00B207] w-5" : "bg-gray-300"} w-3`}
+              className={`h-2 transition-all rounded-lg cursor-pointer ${pageIndex === currentPage ? 'bg-[#00B207] w-8' : 'bg-gray-300'} w-3`}
               onClick={() => {
-                setDirection(pageIndex > currentPage ? 1 : -1);
-                setCurrentPage(pageIndex);
+                setDirection(pageIndex > currentPage ? 1 : -1)
+                setCurrentPage(pageIndex)
               }}
               aria-label={`Go to testimonial page ${pageIndex + 1}`}
             />
@@ -119,14 +137,14 @@ export const Testimonials = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 interface TestimonyCardProps {
-  content: string;
-  image: string;
-  role: string;
-  name: string;
+  content: string
+  image: string
+  role: string
+  name: string
 }
 
 const TestimonyCard = ({
@@ -136,7 +154,7 @@ const TestimonyCard = ({
   name,
 }: Readonly<TestimonyCardProps>) => {
   return (
-    <div className="flex flex-col items-center justify-center p-4 min-w-xl max-w-xl">
+    <div className="flex flex-col items-center justify-center p-4 min-w-sm max-w-sm lg:min-w-lg lg:max-w-lg">
       <div className="flex flex-col items-center gap-4 border w-full border-neutral-200 p-6 rounded-lg">
         <Image
           src="/quote.svg"
@@ -162,5 +180,5 @@ const TestimonyCard = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
