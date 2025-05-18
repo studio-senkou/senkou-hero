@@ -39,7 +39,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
   }, [sidebarOpen])
 
   const NavLinks = ({ onClick }: { onClick?: () => void }) => (
-    <ul className="flex flex-col md:flex-row gap-4 md:gap-6 font-semibold text-base md:text-xs">
+    <ul className="flex flex-col md:flex-row gap-4 md:gap-6 font-medium text-base md:text-md">
       {NAVIGATION_ITEMS.map((item) => (
         <li key={item.label}>
           <Link
@@ -61,7 +61,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
     pathname === '/' ? (
       <Image src="/hero-logo-c1.png" alt="Hero Logo" width={64} height={12} />
     ) : (
-      <h1 className="text-xl font-semibold">Hero</h1>
+      <h1 className="text-2xl font-medium">Hero</h1>
     )
 
   return (
@@ -85,7 +85,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
             <Button
               key={`search-${bp}-${i}`}
               variant="ghost"
-              className={bp ? `hidden ${bp}:inline-flex` : `${bp}hidden`}
+              className={bp ? `hidden ${bp}:inline-flex` : `${bp}:hidden`}
             >
               <Search />
             </Button>
@@ -94,7 +94,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
             <Link
               key={`cart-${bp}-${i}`}
               href="/cart"
-              className={bp ? `hidden ${bp}:inline-flex` : `${bp}hidden`}
+              className={bp ? `hidden ${bp}:inline-flex` : `${bp}:hidden`}
             >
               <ShoppingCart size={16} />
             </Link>
