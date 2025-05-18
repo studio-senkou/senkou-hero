@@ -26,7 +26,7 @@ export const CartSummary = ({ items = [] }: { items: unknown[] }) => {
           <span>$0.00</span>
         </div>
       </div>
-      <Button className="mt-12 bg-[#00B207] p-5  rounded-full">
+      <Button className="mt-12 bg-[#00B207] p-5  rounded-full cursor-pointer hover:bg-[#00b206bb] text-white font-regular transition">
         Process to checkout
       </Button>
     </div>
@@ -51,7 +51,7 @@ export const CartCoupon = ({
           className="bg-white rounded-full p-5 placeholder:text-neutral-400 w-full"
           placeholder="Enter code"
         />
-        <Button className="absolute top-1/2 right-0 -translate-y-1/2 text-white rounded-full px-8 py-5 font-regular transition">
+        <Button className="absolute top-1/2 right-0 -translate-y-1/2 text-white rounded-full px-8 py-5 font-regular transition cursor-pointer">
           Apply Coupon
         </Button>
       </div>

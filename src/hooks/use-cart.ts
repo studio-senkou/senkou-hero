@@ -5,7 +5,8 @@ import type { CartItem } from '@hero/types/dto'
 interface CartStore {
   items: CartItem[]
   selectedItems: CartItem[]
-  addItem: (item: CartItem) => void
+  addItem: (item: Omit<CartItem, 'quantity'>) => void
+  updateQuantity: (id: string, direction: 'increase' | 'decrease') => void
   removeItem: (id: string) => void
   selectItem: (id: string) => void
   clearCart: () => void
@@ -22,13 +23,11 @@ export const useCart = create<CartStore>()(
           if (existingItem) {
             return {
               items: state.items.map((i) =>
-                i.id === item.id
-                  ? { ...i, quantity: i.quantity + item.quantity }
-                  : i,
+                i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
               ),
             }
           }
-          return { items: [...state.items, item] }
+          return { items: [...state.items, { ...item, quantity: 1 }] }
         }),
       selectItem: (id) =>
         set((state) => {
@@ -40,6 +39,27 @@ export const useCart = create<CartStore>()(
           }
           return { selectedItems: [] }
         }),
+      updateQuantity: (id, direction) => {
+        set((state) => {
+          const item = state.items.find((item) => item.id === id)
+          if (item) {
+            if (direction === 'increase') {
+              return {
+                items: state.items.map((i) =>
+                  i.id === id ? { ...i, quantity: item.quantity + 1 } : i,
+                ),
+              }
+            } else if (direction === 'decrease' && item.quantity > 1) {
+              return {
+                items: state.items.map((i) =>
+                  i.id === id ? { ...i, quantity: item.quantity - 1 } : i,
+                ),
+              }
+            }
+          }
+          return { items: state.items }
+        })
+      },
       removeItem: (id) =>
         set((state) => ({
           items: state.items.filter((item) => item.id !== id),

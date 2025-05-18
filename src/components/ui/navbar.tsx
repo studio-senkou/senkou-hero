@@ -18,6 +18,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from './breadcrumb'
+import { useCart } from '@hero/hooks/use-cart'
 
 interface NavbarProps extends React.HTMLAttributes<HTMLDivElement> {
   breadcrumbLabel?: string
@@ -27,6 +28,8 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
   const [hasScrolled, setHasScrolled] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
+
+  const cartItems = useCart((state) => state.items)
 
   useEffect(() => {
     const handleScroll = () => setHasScrolled(window.scrollY > 48)
@@ -98,10 +101,15 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
               href="/cart"
               className={cn(
                 bp ? `hidden ${bp}:inline-flex p-0` : `${bp}:hidden p-0`,
-                'items-center justify-center',
+                'relative items-center justify-center',
               )}
             >
               <ShoppingCart className="w-5 h-5" />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 flex items-center justify-center h-4 w-4 rounded-full bg-red-500 text-white text-xs font-bold">
+                  {cartItems.length}
+                </span>
+              )}
             </Link>
           ))}
           <Button
@@ -153,7 +161,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
 
       {/* Breadcrumb */}
       {pathname !== '/' && (
-        <div className="p-2 bg-black text-white">
+        <div className="py-2 px-6 bg-black text-white">
           <div className="flex items-center lg:max-w-3/4 mx-auto">
             <Breadcrumb>
               <BreadcrumbList>

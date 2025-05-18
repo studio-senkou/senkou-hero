@@ -2,32 +2,84 @@
 
 import Image from 'next/image'
 import { CATEGORIES } from '@hero/constants/product'
-import { GitPullRequestDraft, ShoppingBag } from 'lucide-react'
+import { ShoppingBag } from 'lucide-react'
 import { Button } from './ui/button'
 import { Label } from './ui/label'
 import { RangeSlider } from './ui/range-slider'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
-import { useState } from 'react'
+import { cn } from '@hero/lib/utils'
+import { Product } from '@hero/types/dto'
 
-export const ProductCard = () => {
+interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  product: Product
+  onStoreCart?: (product: Product) => void
+}
+
+export const ProductCard = ({
+  product,
+  onStoreCart,
+  className,
+  ...props
+}: ProductCardProps) => {
   return (
-    <div className="flex flex-col border border-neutral-200 rounded-md p-4 gap-4">
+    <div
+      className={cn(
+        'flex flex-col border border-neutral-200 rounded-md p-4 gap-4',
+        className,
+      )}
+      id={product.id}
+      {...props}
+    >
       <Image
-        src="/products/apple-p1.png"
+        src={product.images[0]}
         alt="Product Image"
         width={200}
         height={200}
         className="rounded-md"
         loading="lazy"
       />
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-2">
         <div>
-          <h3 className="text-neutral-500">Product name</h3>
-          <span className="text-xl font-semibold">$0.00</span>
+          <h3 className="text-neutral-500 line-clamp-1">{product.title}</h3>
+          <span>
+            {product.price.toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD',
+            })}
+          </span>
         </div>
         <Button
           variant="ghost"
-          className="bg-neutral-100 rounded-full p-2 cursor-pointer hover:bg-neutral-200"
+          className="bg-neutral-100 rounded-full p-2 cursor-pointer hover:bg-neutral-200 relative overflow-visible"
+          onClick={(e) => {
+            onStoreCart?.(product)
+            // Animasi "fly to cart"
+            const img = e.currentTarget.closest('div')?.querySelector('img')
+            const cartIcon = e.currentTarget
+            if (img && cartIcon) {
+              const imgRect = img.getBoundingClientRect()
+              const cartRect = cartIcon.getBoundingClientRect()
+              const clone = img.cloneNode(true) as HTMLElement
+              clone.style.position = 'fixed'
+              clone.style.left = `${imgRect.left}px`
+              clone.style.top = `${imgRect.top}px`
+              clone.style.width = `${imgRect.width}px`
+              clone.style.height = `${imgRect.height}px`
+              clone.style.transition = 'all 0.7s cubic-bezier(.4,2,.6,1)'
+              clone.style.zIndex = '9999'
+              document.body.appendChild(clone)
+              setTimeout(() => {
+                clone.style.left = `${cartRect.left}px`
+                clone.style.top = `${cartRect.top}px`
+                clone.style.width = '32px'
+                clone.style.height = '32px'
+                clone.style.opacity = '0.5'
+              }, 10)
+              setTimeout(() => {
+                document.body.removeChild(clone)
+              }, 800)
+            }
+          }}
         >
           <ShoppingBag />
         </Button>
@@ -36,17 +88,21 @@ export const ProductCard = () => {
   )
 }
 
-export const ProductFilter = () => {
-  const [minPrice, setMinPrice] = useState(0)
-  const [maxPrice, setMaxPrice] = useState(100)
+interface FilterPanelItemProps {
+  minPrice: number
+  maxPrice: number
+  setMinPrice: (value: number) => void
+  setMaxPrice: (value: number) => void
+}
 
+export const FilterPanelItem = ({
+  minPrice,
+  maxPrice,
+  setMinPrice,
+  setMaxPrice,
+}: FilterPanelItemProps) => {
   return (
-    <aside>
-      <Button className="flex items-center px-8 py-4 bg-[#00B207] text-white rounded-full">
-        Filter
-        <GitPullRequestDraft />
-      </Button>
-
+    <>
       <div className="mt-4">
         <h2 className="text-xl">All Categories</h2>
 
@@ -110,6 +166,6 @@ export const ProductFilter = () => {
           </Button>
         </div>
       </div>
-    </aside>
+    </>
   )
 }

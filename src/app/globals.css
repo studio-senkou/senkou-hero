@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -118,8 +118,8 @@
   }
 
   * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-muted) var(--color-background);
+    scrollbar-width: none;
+    scrollbar-color: #000 var(--color-background);
   }
 
   *::-webkit-scrollbar {

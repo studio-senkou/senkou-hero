@@ -10,9 +10,21 @@ import { Button } from '@hero/components/ui/button'
 import { Trash } from 'lucide-react'
 
 export default function Cart() {
-  const { items, clearCart } = useCart()
+  const {
+    items,
+    selectedItems,
+    selectItem,
+    updateQuantity,
+    removeItem,
+    clearCart,
+  } = useCart()
 
-  const columns = cartColumns()
+  const columns = cartColumns({
+    onSelect: (id) => selectItem(id),
+    increaseQuantity: (id) => updateQuantity(id, 'increase'),
+    decreaseQuantity: (id) => updateQuantity(id, 'decrease'),
+    deleteProduct: removeItem,
+  })
 
   return (
     <div className="flex flex-col items-center justify-center w-full mt-40 overflow-hidden">
@@ -37,10 +49,10 @@ export default function Cart() {
 
         <div className="flex flex-col lg:flex-row w-full gap-4 mt-8">
           <div className="flex flex-col gap-4 w-full h-full max-w-none lg:max-w-4/6">
-            <DataTable columns={columns} data={[]} />
+            <DataTable columns={columns} data={items} />
             <CartCoupon className="w-full" />
           </div>
-          <CartSummary items={[]} />
+          <CartSummary items={selectedItems} />
         </div>
       </div>
       <Footer className="mt-12" />
