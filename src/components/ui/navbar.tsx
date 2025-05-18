@@ -39,7 +39,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
   }, [sidebarOpen])
 
   const NavLinks = ({ onClick }: { onClick?: () => void }) => (
-    <ul className="flex flex-col md:flex-row gap-4 md:gap-6 font-medium text-base md:text-md">
+    <ul className="flex flex-col lg:flex-row gap-4 lg:gap-6 font-medium text-base lg:text-md">
       {NAVIGATION_ITEMS.map((item) => (
         <li key={item.label}>
           <Link
@@ -67,41 +67,46 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-in-out',
+        'fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-in-out bg-white',
         hasScrolled
-          ? 'border-b border-gray-100 bg-white/80 backdrop-blur-md'
+          ? 'bg-white/80 backdrop-blur-md'
           : 'border-b border-transparent bg-white',
+        pathname === '/' && hasScrolled && 'border-b border-neutral-200',
         className,
       )}
       {...props}
     >
-      <div className="flex justify-between items-center lg:max-w-3/4 mx-auto p-2">
+      <div className="flex justify-between items-center lg:max-w-3/4 mx-auto p-6">
         <div>{Brand}</div>
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-6">
           <NavLinks />
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-4">
           {['md', ''].map((bp, i) => (
-            <Button
+            <span
               key={`search-${bp}-${i}`}
-              variant="ghost"
-              className={bp ? `hidden ${bp}:inline-flex` : `${bp}:hidden`}
+              className={cn(
+                bp ? `hidden ${bp}:inline-flex p-0` : `${bp}:hidden p-0`,
+              )}
             >
-              <Search />
-            </Button>
+              <Search className="w-5 h-5" />
+            </span>
           ))}
           {['md', ''].map((bp, i) => (
             <Link
               key={`cart-${bp}-${i}`}
               href="/cart"
-              className={bp ? `hidden ${bp}:inline-flex` : `${bp}:hidden`}
+              className={cn(
+                bp ? `hidden ${bp}:inline-flex p-0` : `${bp}:hidden p-0`,
+                'items-center justify-center',
+              )}
             >
-              <ShoppingCart size={16} />
+              <ShoppingCart className="w-5 h-5" />
             </Link>
           ))}
           <Button
             variant="ghost"
-            className="md:hidden"
+            className="lg:hidden"
             onClick={() => setSidebarOpen(true)}
             aria-label="Open menu"
           >
@@ -118,7 +123,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-50 bg-black/40 md:hidden"
+            className="fixed inset-0 z-50 bg-black/40 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           >
             <motion.aside

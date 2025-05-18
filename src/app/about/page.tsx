@@ -5,8 +5,9 @@ import Image from 'next/image'
 
 export default function About() {
   return (
-    <main className="flex flex-col items-center mt-12 lg:mt-24">
+    <main className="flex flex-col items-center justify-center mt-40 overflow-hidden">
       <Navbar />
+
       <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
         <div className="flex flex-col items-start justify-center w-full md:max-w-2xl p-8">
           <h1 className="text-4xl font-bold">

@@ -15,7 +15,7 @@ export default function Cart() {
   const columns = cartColumns()
 
   return (
-    <div className="flex flex-col items-center justify-center w-full mt-28">
+    <div className="flex flex-col items-center justify-center w-full mt-40 overflow-hidden">
       <Navbar />
 
       <div className="w-full lg:w-3/4 px-8">

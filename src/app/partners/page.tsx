@@ -7,7 +7,7 @@ export default async function Partners() {
   const partners = await getPartners()
 
   return (
-    <div className="flex flex-col items-center justify-center w-full mt-32">
+    <div className="flex flex-col items-center justify-center w-full mt-40 overflow-hidden">
       <Navbar />
 
       <div className="w-full max-w-[90vw] md:max-w-3/4 px-4">
