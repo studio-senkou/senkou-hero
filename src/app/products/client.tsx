@@ -107,8 +107,9 @@ export default function ProductsClientPage({
             {products.map((product, index) => (
               <div key={index} className="w-full min-w-[15rem] max-w-[0rem]">
                 <ProductCard
-                  product={product}
+                  product={{ ...product, unit: '500mg' }}
                   onStoreCart={handleStoreProductIntoCart}
+                  direction="column"
                 />
               </div>
             ))}
