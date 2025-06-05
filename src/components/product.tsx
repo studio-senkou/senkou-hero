@@ -9,22 +9,32 @@ import { RangeSlider } from './ui/range-slider'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 import { cn } from '@hero/lib/utils'
 import { Product } from '@hero/types/dto'
+import { useMemo } from 'react'
 
 interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
   product: Product
+  direction?: 'row' | 'column'
   onStoreCart?: (product: Product) => void
 }
 
 export const ProductCard = ({
   product,
+  direction = 'column',
   onStoreCart,
   className,
   ...props
 }: ProductCardProps) => {
+  const priceWithDiscount = useMemo(() => {
+    if (product.discount) {
+      return product.price - (product.price * product.discount) / 100
+    }
+    return product.price
+  }, [product.price, product.discount])
   return (
     <div
       className={cn(
-        'flex flex-col border border-neutral-200 rounded-md p-4 gap-4',
+        'flex border border-neutral-200 rounded-md p-4 gap-4',
+        direction === 'row' ? 'flex-row' : 'flex-col',
         className,
       )}
       id={product.id}
@@ -33,56 +43,73 @@ export const ProductCard = ({
       <Image
         src={product.images[0]}
         alt="Product Image"
-        width={200}
-        height={200}
+        width={direction === 'column' ? 200 : 75}
+        height={direction === 'column' ? 200 : 75}
         className="rounded-md"
         loading="lazy"
       />
       <div className="flex justify-between items-center gap-2">
-        <div>
+        <div className="flex flex-col gap-1">
           <h3 className="text-neutral-500 line-clamp-1">{product.title}</h3>
-          <span>
-            {product.price.toLocaleString('en-US', {
-              style: 'currency',
-              currency: 'USD',
-            })}
-          </span>
+          <p className="text-neutral-400">{product.unit}</p>
+          <div className="flex items-end gap-2">
+            <span
+              className={cn(
+                product.discount && 'line-through',
+                'text-sm text-neutral-400',
+              )}
+            >
+              {product.price.toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+              })}
+            </span>
+            {product.discount && (
+              <span>
+                {priceWithDiscount.toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                })}
+              </span>
+            )}
+          </div>
         </div>
-        <Button
-          variant="ghost"
-          className="bg-neutral-100 rounded-full p-2 cursor-pointer hover:bg-neutral-200 relative overflow-visible"
-          onClick={(e) => {
-            onStoreCart?.(product)
-            // Animasi "fly to cart"
-            const img = e.currentTarget.closest('div')?.querySelector('img')
-            const cartIcon = e.currentTarget
-            if (img && cartIcon) {
-              const imgRect = img.getBoundingClientRect()
-              const cartRect = cartIcon.getBoundingClientRect()
-              const clone = img.cloneNode(true) as HTMLElement
-              clone.style.position = 'fixed'
-              clone.style.left = `${imgRect.left}px`
-              clone.style.top = `${imgRect.top}px`
-              clone.style.width = `${imgRect.width}px`
-              clone.style.height = `${imgRect.height}px`
-              clone.style.transition = 'all 0.7s cubic-bezier(.4,2,.6,1)'
-              clone.style.zIndex = '9999'
-              document.body.appendChild(clone)
-              setTimeout(() => {
-                clone.style.left = `${cartRect.left}px`
-                clone.style.top = `${cartRect.top}px`
-                clone.style.width = '32px'
-                clone.style.height = '32px'
-                clone.style.opacity = '0.5'
-              }, 10)
-              setTimeout(() => {
-                document.body.removeChild(clone)
-              }, 800)
-            }
-          }}
-        >
-          <ShoppingBag />
-        </Button>
+        {direction === 'column' && (
+          <Button
+            variant="ghost"
+            className="bg-neutral-100 rounded-full p-2 cursor-pointer hover:bg-neutral-200 relative overflow-visible"
+            onClick={(e) => {
+              onStoreCart?.(product)
+              const img = e.currentTarget.closest('div')?.querySelector('img')
+              const cartIcon = e.currentTarget
+              if (img && cartIcon) {
+                const imgRect = img.getBoundingClientRect()
+                const cartRect = cartIcon.getBoundingClientRect()
+                const clone = img.cloneNode(true) as HTMLElement
+                clone.style.position = 'fixed'
+                clone.style.left = `${imgRect.left}px`
+                clone.style.top = `${imgRect.top}px`
+                clone.style.width = `${imgRect.width}px`
+                clone.style.height = `${imgRect.height}px`
+                clone.style.transition = 'all 0.7s cubic-bezier(.4,2,.6,1)'
+                clone.style.zIndex = '9999'
+                document.body.appendChild(clone)
+                setTimeout(() => {
+                  clone.style.left = `${cartRect.left}px`
+                  clone.style.top = `${cartRect.top}px`
+                  clone.style.width = '32px'
+                  clone.style.height = '32px'
+                  clone.style.opacity = '0.5'
+                }, 10)
+                setTimeout(() => {
+                  document.body.removeChild(clone)
+                }, 800)
+              }
+            }}
+          >
+            <ShoppingBag />
+          </Button>
+        )}
       </div>
     </div>
   )

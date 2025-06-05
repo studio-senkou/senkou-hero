@@ -1,5 +1,3 @@
-'use client'
-
 import { Footer } from '@hero/components/footer'
 import { Partners } from '@hero/components/partners'
 import { Services } from '@hero/components/services'
@@ -9,8 +7,15 @@ import { LandingJumbotron } from '@hero/components/jumbotron'
 import { Navbar } from '@hero/components/ui/navbar'
 import { ArrowRight, Check } from 'lucide-react'
 import Image from 'next/image'
+import { ProductCard } from '@hero/components/product'
+import { getBestSellingProducts, getProducts } from '@hero/lib/products'
 
-export default function Home() {
+export default async function Home() {
+  const products = await getProducts()
+  const bestSellingProducts = getBestSellingProducts()
+
+  console.log({ bestSellingProducts })
+
   return (
     <div className="overflow-hidden transition-all duration-500 ease-in-out">
       <Navbar />
@@ -20,6 +25,79 @@ export default function Home() {
       </div>
 
       <Partners className="mt-20" />
+
+      <div className="flex flex-col items-center justify-center mt-20 w-full">
+        <h2 className="text-3xl font-bold text-center mb-5">
+          Features Products
+        </h2>
+
+        <section className="flex items-start gap-4 lg:max-w-3/4 w-full mx-auto overflow-x-auto px-4">
+          {Array.from({ length: 7 }, (_, index) => (
+            <ProductCard
+              key={index}
+              product={{
+                id: '1',
+                title: 'Organic Avocado',
+                price: 2.99,
+                unit: '500mg',
+                discount: 5,
+                images: [
+                  'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp',
+                ],
+                description: 'Fresh organic avocado from local farms.',
+                category: ['Fruits'],
+              }}
+            />
+          ))}
+        </section>
+
+        <section className="flex flex-col sm:flex-row sm:justify-start items-stretch flex-wrap gap-4 w-full lg:max-w-3/4 mx-auto mt-8 px-4">
+          <div className="flex flex-col gap-4 flex-1 min-w-60">
+            <h3 className="text-xl font-semibold">Hot Deals</h3>
+            {Array.from({ length: 3 }, (_, index) => (
+              <ProductCard
+                key={index}
+                direction="row"
+                className="min-w-60"
+                product={{
+                  id: '1',
+                  title: 'Organic Avocado',
+                  price: 2.99,
+                  unit: '500mg',
+                  discount: 5,
+                  images: [
+                    'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp',
+                  ],
+                  description: 'Fresh organic avocado from local farms.',
+                  category: ['Fruits'],
+                }}
+              />
+            ))}
+          </div>
+          <div className="flex flex-col gap-4 flex-1 min-w-60">
+            <h3 className="text-xl font-semibold">Hot Deals</h3>
+            {Array.from({ length: 3 }, (_, index) => (
+              <ProductCard
+                key={index}
+                direction="row"
+                className="min-w-60"
+                product={{
+                  id: '1',
+                  title: 'Organic Avocado',
+                  price: 2.99,
+                  unit: '500mg',
+                  discount: 5,
+                  images: [
+                    'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp',
+                  ],
+                  description: 'Fresh organic avocado from local farms.',
+                  category: ['Fruits'],
+                }}
+              />
+            ))}
+          </div>
+        </section>
+      </div>
 
       <div className="min-w-screen bg-[#F0F5F1] p-4 md:p-16 mt-20">
         <div className="flex flex-col lg:flex-row justify-center items-center gap-8 max-w-6xl mx-auto">
