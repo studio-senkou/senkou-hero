@@ -90,7 +90,7 @@ export default function ProductsClientPage({
     if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current)
     debounceTimeoutRef.current = setTimeout(() => {
       pushPriceFilterToRouter()
-    }, 100)
+    }, 500)
   }
 
   const handleChangeMinPrice = (min: number) => {
