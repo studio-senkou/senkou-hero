@@ -16,25 +16,101 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@hero/components/ui/sheet'
 import { useCart } from '@hero/hooks/use-cart'
 import { useProductFilter } from '@hero/hooks/use-product-filter'
-import { Product } from '@hero/types/dto'
+import { Product, ProductCountByCategory } from '@hero/types/dto'
 import { GitPullRequestDraft } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 
 interface ProductsClientPageProps {
-  products: Product[]
+  products: Array<Product>
+  categories: Array<ProductCountByCategory>
+  filter?: {
+    category?: string
+    price?: {
+      min: number
+      max: number
+    }
+  }
 }
 
 export default function ProductsClientPage({
   products,
+  categories = [],
+  filter: initialFilter,
 }: ProductsClientPageProps) {
-  const { price, setPrice } = useProductFilter()
-  const addIntoCart = useCart((state) => state.addItem)
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-  const handleStoreProductIntoCart = (product: Product) => {
-    addIntoCart({
+  const { price: currentPrice, setPrice: setCurrentPrice } = useProductFilter()
+  const hydrateFilterStore = useProductFilter((s) => s.hydrate)
+  const isFilterHydrated = useProductFilter((s) => s.hydrated)
+  const addProductToCart = useCart((state) => state.addItem)
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const pendingPriceRef = useRef<{ min?: number; max?: number }>({})
+
+  useEffect(() => {
+    if (!isFilterHydrated && initialFilter?.price) {
+      hydrateFilterStore({
+        price: initialFilter.price,
+        categories: initialFilter.category ? [initialFilter.category] : [],
+        tags: [],
+      })
+    }
+  }, [isFilterHydrated, hydrateFilterStore, initialFilter?.price])
+
+  if (!isFilterHydrated) return null
+
+  const handleCategoryChange = (categoryName: string) => {
+    const currentCategory = searchParams.get('category')
+    if (currentCategory === categoryName) return
+
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('category', categoryName)
+    router?.push(`/products?${params.toString()}`)
+  }
+
+  const pushPriceFilterToRouter = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (pendingPriceRef.current.min !== undefined) {
+      params.set('price[min]', pendingPriceRef.current.min.toString())
+    }
+    if (pendingPriceRef.current.max !== undefined) {
+      params.set('price[max]', pendingPriceRef.current.max.toString())
+    }
+    router?.push(`/products?${params.toString()}`)
+  }
+
+  const debouncedPushPriceFilter = () => {
+    if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current)
+    debounceTimeoutRef.current = setTimeout(() => {
+      pushPriceFilterToRouter()
+    }, 500)
+  }
+
+  const handleChangeMinPrice = (min: number) => {
+    const currentMinPrice = initialFilter?.price?.min || 0
+    if (currentMinPrice > min) return
+
+    setCurrentPrice({ min })
+    pendingPriceRef.current.min = min
+    debouncedPushPriceFilter()
+  }
+
+  const handleChangeMaxPrice = (max: number) => {
+    const currentMaxPrice = initialFilter?.price?.max || 0
+    if (currentMaxPrice < max) return
+
+    setCurrentPrice({ max })
+    pendingPriceRef.current.max = max
+    debouncedPushPriceFilter()
+  }
+
+  const handleAddProductToCart = (product: Product) => {
+    addProductToCart({
       id: product.id,
       name: product.title,
       price: product.price,
-      image: product.images[0],
+      image: product.image,
     })
   }
 
@@ -51,10 +127,19 @@ export default function ProductsClientPage({
             </Button>
 
             <FilterPanelItem
-              minPrice={price.min}
-              maxPrice={price.max}
-              setMinPrice={(price) => setPrice({ min: price })}
-              setMaxPrice={(price) => setPrice({ max: price })}
+              category={{
+                categories: categories,
+                selectedCategory: initialFilter?.category,
+                onCategoryChange: handleCategoryChange,
+              }}
+              price={{
+                originalMinPrice: initialFilter?.price?.min || 0,
+                originalMaxPrice: initialFilter?.price?.max || 0,
+                minPrice: currentPrice.min,
+                maxPrice: currentPrice.max,
+                setMinPrice: handleChangeMinPrice,
+                setMaxPrice: handleChangeMaxPrice,
+              }}
             />
           </aside>
         </div>
@@ -70,10 +155,19 @@ export default function ProductsClientPage({
                 </SheetTrigger>
                 <SheetContent side="left" className="p-8 overflow-y-auto">
                   <FilterPanelItem
-                    minPrice={price.min}
-                    maxPrice={price.max}
-                    setMinPrice={(price) => setPrice({ min: price })}
-                    setMaxPrice={(price) => setPrice({ max: price })}
+                    category={{
+                      categories: categories,
+                      selectedCategory: initialFilter?.category,
+                      onCategoryChange: handleCategoryChange,
+                    }}
+                    price={{
+                      originalMinPrice: initialFilter?.price?.min || 0,
+                      originalMaxPrice: initialFilter?.price?.max || 0,
+                      minPrice: currentPrice.min,
+                      maxPrice: currentPrice.max,
+                      setMinPrice: handleChangeMinPrice,
+                      setMaxPrice: handleChangeMaxPrice,
+                    }}
                   />
                 </SheetContent>
               </Sheet>
@@ -98,8 +192,10 @@ export default function ProductsClientPage({
             </div>
             <div className="hidden lg:flex items-center gap-4 text-neutral-400">
               <h4 className="text-md">
-                <span className="text-neutral-500 font-bold">10</span> Results
-                Found
+                <span className="text-neutral-500 font-bold">
+                  {products.length}
+                </span>{' '}
+                Results Found
               </h4>
             </div>
           </div>
@@ -108,7 +204,7 @@ export default function ProductsClientPage({
               <div key={index} className="w-full min-w-[15rem] max-w-[0rem]">
                 <ProductCard
                   product={{ ...product, unit: '500mg' }}
-                  onStoreCart={handleStoreProductIntoCart}
+                  onStoreCart={handleAddProductToCart}
                   direction="column"
                 />
               </div>

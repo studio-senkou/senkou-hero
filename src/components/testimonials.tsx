@@ -1,18 +1,22 @@
 'use client'
 
 import { cn } from '@hero/lib/utils'
-import { useEffect, useRef, useState } from 'react'
+import { ComponentProps, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
-import { TESTIMONIALS } from '@hero/constants/testimony'
+import type { Testimony } from '@hero/types/dto'
+
+interface TestimonialProps extends ComponentProps<'div'> {
+  testimonials: Array<Testimony>
+}
 
 export const Testimonials = ({
+  testimonials,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) => {
+}: TestimonialProps) => {
   const AUTOPLAY_INTERVAL = 10000
 
-  // Responsive: detect mobile using window.matchMedia
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
@@ -30,7 +34,7 @@ export const Testimonials = ({
   const [direction, setDirection] = useState(1)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const totalPages = Math.ceil(TESTIMONIALS.length / CARDS_PER_PAGE)
+  const totalPages = Math.ceil(testimonials?.length / CARDS_PER_PAGE)
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -47,13 +51,12 @@ export const Testimonials = ({
     }
   }, [currentPage, totalPages])
 
-  // Reset currentPage if totalPages changes (e.g., on resize)
   useEffect(() => {
     setCurrentPage(0)
   }, [CARDS_PER_PAGE])
 
   const startIndex = currentPage * CARDS_PER_PAGE
-  const currentTestimonials = TESTIMONIALS.slice(
+  const currentTestimonials = testimonials.slice(
     startIndex,
     startIndex + CARDS_PER_PAGE,
   )
@@ -113,10 +116,7 @@ export const Testimonials = ({
               {currentTestimonials.map((testimonial, testimonialIndex) => (
                 <TestimonyCard
                   key={startIndex + testimonialIndex}
-                  content={testimonial.content}
-                  image={testimonial.image}
-                  role={testimonial.role}
-                  name={testimonial.name}
+                  {...testimonial}
                 />
               ))}
             </motion.div>
@@ -140,19 +140,7 @@ export const Testimonials = ({
   )
 }
 
-interface TestimonyCardProps {
-  content: string
-  image: string
-  role: string
-  name: string
-}
-
-const TestimonyCard = ({
-  content,
-  image,
-  role,
-  name,
-}: Readonly<TestimonyCardProps>) => {
+const TestimonyCard = ({ testimony, client }: Readonly<Testimony>) => {
   return (
     <div className="flex flex-col items-center justify-center p-4 min-w-sm max-w-sm lg:min-w-lg lg:max-w-lg">
       <div className="flex flex-col items-center gap-4 border w-full border-neutral-200 p-6 rounded-lg">
@@ -163,20 +151,28 @@ const TestimonyCard = ({
           height={36}
           loading="lazy"
         />
-        <q>{content}</q>
+        <q>{testimony}</q>
       </div>
       <div className="flex flex-col items-center gap-4 mt-4">
-        <Image
-          src={image}
-          alt={name}
-          width={50}
-          height={50}
-          className="rounded-full"
-          loading="lazy"
-        />
+        <div className="w-[72px] h-[72px] relative">
+          <Image
+            src={
+              client.client_image
+                ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${client.client_image}`
+                : 'https://placehold.in/200.webp'
+            }
+            alt={client.client_name}
+            fill
+            className="rounded-full object-cover"
+            loading="lazy"
+            sizes="72px"
+          />
+        </div>
         <div className="flex flex-col items-center">
-          <h3 className="text-lg font-semibold text-[#002603]">{name}</h3>
-          <p className="text-sm text-gray-500">{role}</p>
+          <h3 className="text-lg font-semibold text-[#002603]">
+            {client.client_name}
+          </h3>
+          <p className="text-sm text-gray-500">{client.organization_name}</p>
         </div>
       </div>
     </div>

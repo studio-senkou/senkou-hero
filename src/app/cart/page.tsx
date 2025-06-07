@@ -14,17 +14,27 @@ export default function Cart() {
     items,
     selectedItems,
     selectItem,
+    disselectItem,
     updateQuantity,
     removeItem,
     clearCart,
   } = useCart()
 
+  const isItemSelected = (id: string) =>
+    selectedItems.some((item) => item.id === id)
+
   const columns = cartColumns({
     onSelect: (id) => selectItem(id),
+    onDeselect: (id) => disselectItem(id),
     increaseQuantity: (id) => updateQuantity(id, 'increase'),
     decreaseQuantity: (id) => updateQuantity(id, 'decrease'),
     deleteProduct: removeItem,
+    isItemSelected,
   })
+
+  const handleCheckoutProduct = (ids: Array<string>) => {
+    ids.forEach((id) => removeItem(id))
+  }
 
   return (
     <div className="flex flex-col items-center justify-center w-full mt-40 overflow-hidden">
@@ -52,7 +62,10 @@ export default function Cart() {
             <DataTable columns={columns} data={items} />
             <CartCoupon className="w-full" />
           </div>
-          <CartSummary items={selectedItems} />
+          <CartSummary
+            items={selectedItems}
+            onCheckout={handleCheckoutProduct}
+          />
         </div>
       </div>
       <Footer className="mt-12" />

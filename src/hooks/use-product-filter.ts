@@ -1,7 +1,17 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
+type StoreStateOnly<T> = {
+  [K in keyof T as T[K] extends Function ? never : K]: T[K]
+}
+
 interface ProductFilterStore {
+  hydrated: boolean
+  hydrate: (
+    payload: Partial<
+      StoreStateOnly<Omit<ProductFilterStore, 'hydrated' | 'hydrate'>>
+    >,
+  ) => void
   categories: Array<string>
   price: {
     min: number
@@ -16,6 +26,18 @@ interface ProductFilterStore {
 export const useProductFilter = create<ProductFilterStore>()(
   persist(
     (set, get) => ({
+      // Hydration state
+      hydrated: false,
+      hydrate: (
+        payload: Partial<
+          StoreStateOnly<Omit<ProductFilterStore, 'hydrated' | 'hydrate'>>
+        >,
+      ) => {
+        if (!get().hydrated) {
+          set({ ...payload, hydrated: true })
+        }
+      },
+
       categories: [],
       price: {
         min: 0,

@@ -9,12 +9,12 @@ import { ArrowRight, Check } from 'lucide-react'
 import Image from 'next/image'
 import { ProductCard } from '@hero/components/product'
 import { getBestSellingProducts, getProducts } from '@hero/lib/products'
+import { getClientsTestimony } from '@hero/lib/clients'
 
 export default async function Home() {
   const products = await getProducts()
-  const bestSellingProducts = getBestSellingProducts()
-
-  console.log({ bestSellingProducts })
+  const bestSellingProducts = await getBestSellingProducts()
+  const testimonials = await getClientsTestimony()
 
   return (
     <div className="overflow-hidden transition-all duration-500 ease-in-out">
@@ -32,68 +32,22 @@ export default async function Home() {
         </h2>
 
         <section className="flex items-start gap-4 lg:max-w-3/4 w-full mx-auto overflow-x-auto px-4">
-          {Array.from({ length: 7 }, (_, index) => (
-            <ProductCard
-              key={index}
-              product={{
-                id: '1',
-                title: 'Organic Avocado',
-                price: 2.99,
-                unit: '500mg',
-                discount: 5,
-                images: [
-                  'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp',
-                ],
-                description: 'Fresh organic avocado from local farms.',
-                category: ['Fruits'],
-              }}
-            />
+          {bestSellingProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
           ))}
         </section>
 
         <section className="flex flex-col sm:flex-row sm:justify-start items-stretch flex-wrap gap-4 w-full lg:max-w-3/4 mx-auto mt-8 px-4">
           <div className="flex flex-col gap-4 flex-1 min-w-60">
             <h3 className="text-xl font-semibold">Hot Deals</h3>
-            {Array.from({ length: 3 }, (_, index) => (
-              <ProductCard
-                key={index}
-                direction="row"
-                className="min-w-60"
-                product={{
-                  id: '1',
-                  title: 'Organic Avocado',
-                  price: 2.99,
-                  unit: '500mg',
-                  discount: 5,
-                  images: [
-                    'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp',
-                  ],
-                  description: 'Fresh organic avocado from local farms.',
-                  category: ['Fruits'],
-                }}
-              />
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} direction="row" />
             ))}
           </div>
           <div className="flex flex-col gap-4 flex-1 min-w-60">
             <h3 className="text-xl font-semibold">Hot Deals</h3>
-            {Array.from({ length: 3 }, (_, index) => (
-              <ProductCard
-                key={index}
-                direction="row"
-                className="min-w-60"
-                product={{
-                  id: '1',
-                  title: 'Organic Avocado',
-                  price: 2.99,
-                  unit: '500mg',
-                  discount: 5,
-                  images: [
-                    'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp',
-                  ],
-                  description: 'Fresh organic avocado from local farms.',
-                  category: ['Fruits'],
-                }}
-              />
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} direction="row" />
             ))}
           </div>
         </section>
@@ -179,7 +133,7 @@ export default async function Home() {
         </div>
       </div>
 
-      <Testimonials className="my-20" />
+      <Testimonials className="my-20" testimonials={testimonials} />
       <Footer />
     </div>
   )

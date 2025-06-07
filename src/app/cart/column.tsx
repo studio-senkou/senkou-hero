@@ -1,13 +1,15 @@
 'use client'
 
 import { Checkbox } from '@hero/components/ui/checkbox'
-import { CartItem } from '@hero/types/dto'
-import { ColumnDef } from '@tanstack/react-table'
+import type { CartItem } from '@hero/types/dto'
+import type { ColumnDef } from '@tanstack/react-table'
 import { Minus, Plus, X } from 'lucide-react'
 import Image from 'next/image'
 
 interface CartColumnsProps {
   onSelect: (id: string) => void
+  onDeselect: (id: string) => void
+  isItemSelected: (id: string) => boolean
   increaseQuantity: (id: string) => void
   decreaseQuantity: (id: string) => void
   deleteProduct: (id: string) => void
@@ -15,6 +17,8 @@ interface CartColumnsProps {
 
 export const cartColumns = ({
   onSelect,
+  onDeselect,
+  isItemSelected,
   increaseQuantity,
   decreaseQuantity,
   deleteProduct,
@@ -33,10 +37,10 @@ export const cartColumns = ({
     ),
     cell: ({ row }) => (
       <Checkbox
-        checked={row.getIsSelected()}
+        checked={isItemSelected(row.original.id)}
         onCheckedChange={(value) => {
           row.toggleSelected(!!value)
-          onSelect(row.original.id)
+          value ? onSelect(row.original.id) : onDeselect(row.original.id)
         }}
         aria-label="Select row"
       />
@@ -51,7 +55,11 @@ export const cartColumns = ({
     cell: ({ row }) => (
       <div className="flex items-center space-x-2">
         <Image
-          src={row.original.image}
+          src={
+            row.original.image
+              ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/products/${row.original.image}`
+              : 'https://placehold.in/200.webp'
+          }
           alt={row.original.name}
           className="rounded-md"
           width={50}
