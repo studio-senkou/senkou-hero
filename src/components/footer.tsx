@@ -6,7 +6,7 @@ import { Button } from './ui/button'
 import { FOOTER_LINKS, SOCIAL_LINKS } from '@hero/constants/footer'
 import Link from 'next/link'
 import { cn } from '@hero/lib/utils'
-import { useTransition, useState } from 'react'
+import { useTransition } from 'react'
 import { subscribe } from '@hero/lib/subscription'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -116,7 +116,7 @@ function NewsletterSubscribeForm() {
       try {
         await subscribe(data.email)
         reset()
-      } catch (err) {
+      } catch {
         toast.error('Subscription failed', {
           description: 'Please try again later.',
           duration: 3000,

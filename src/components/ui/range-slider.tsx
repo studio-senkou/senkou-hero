@@ -51,15 +51,15 @@ export function RangeSlider({
       }
 
       const stop = () => {
-        window.removeEventListener('mousemove', move as any)
+        window.removeEventListener('mousemove', move)
         window.removeEventListener('mouseup', stop)
-        window.removeEventListener('touchmove', move as any)
+        window.removeEventListener('touchmove', move)
         window.removeEventListener('touchend', stop)
       }
 
-      window.addEventListener('mousemove', move as any)
+      window.addEventListener('mousemove', move)
       window.addEventListener('mouseup', stop)
-      window.addEventListener('touchmove', move as any)
+      window.addEventListener('touchmove', move)
       window.addEventListener('touchend', stop)
     }
 
