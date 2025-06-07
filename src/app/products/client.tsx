@@ -16,9 +16,9 @@ import { Sheet, SheetContent, SheetTrigger } from '@hero/components/ui/sheet'
 import { useCart } from '@hero/hooks/use-cart'
 import { useProductFilter } from '@hero/hooks/use-product-filter'
 import { Product, ProductCountByCategory, ProductTag } from '@hero/types/dto'
-import { GitPullRequestDraft } from 'lucide-react'
+import { GitPullRequestDraft, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef, useState, Suspense } from 'react'
+import { useEffect, useRef, useState, Suspense, useMemo } from 'react'
 import { Skeleton } from '@hero/components/ui/skeleton'
 
 interface ProductsClientPageProps {
@@ -53,6 +53,19 @@ export default function ProductsClientPage({
   const addProductToCart = useCart((state) => state.addItem)
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pendingPriceRef = useRef<{ min?: number; max?: number }>({})
+
+  const hasFilter = useMemo(() => {
+    const category = searchParams.get('category')
+    const minPrice = searchParams.get('price[min]')
+    const maxPrice = searchParams.get('price[max]')
+    const tags = searchParams.getAll('tag')
+    const hasCategory = !!category
+    const hasMinPrice = !!minPrice
+    const hasMaxPrice = !!maxPrice
+    const hasTags = tags && tags.length > 0
+
+    return hasCategory || hasMinPrice || hasMaxPrice || hasTags
+  }, [searchParams])
 
   useEffect(() => {
     if (!isFilterHydrated && initialFilter?.price) {
@@ -157,9 +170,19 @@ export default function ProductsClientPage({
       <div className="flex w-full lg:max-w-3/4 gap-8 px-8">
         <div className="w-1/5 hidden lg:block">
           <aside>
-            <Button className="flex items-center px-8 py-4 bg-[#00B207] text-white rounded-full">
+            <Button
+              className="flex items-center px-8 py-4 cursor-pointer bg-[#00B207] text-white rounded-full"
+              onClick={() => {
+                if (hasFilter) {
+                  router.push('/products')
+                  setTimeout(() => {
+                    router.refresh()
+                  }, 500)
+                }
+              }}
+            >
               Filter
-              <GitPullRequestDraft />
+              {hasFilter ? <X /> : <GitPullRequestDraft />}
             </Button>
 
             {!isFilterHydrated || isProductLoading ? (
@@ -240,7 +263,7 @@ export default function ProductsClientPage({
                 disabled={isProductLoading}
               >
                 <SelectTrigger className="min-w-[120px]">
-                  <SelectValue placeholder="Select your veggie" />
+                  <SelectValue placeholder="Latest" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
