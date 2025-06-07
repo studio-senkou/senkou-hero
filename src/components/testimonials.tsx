@@ -1,10 +1,11 @@
 'use client'
 
 import { cn } from '@hero/lib/utils'
-import { ComponentProps, useEffect, useRef, useState } from 'react'
+import { ComponentProps, useEffect, useRef, useState, Suspense } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import type { Testimony } from '@hero/types/dto'
+import { Skeleton } from './ui/skeleton'
 
 interface TestimonialProps extends ComponentProps<'div'> {
   testimonials: Array<Testimony>
@@ -97,31 +98,41 @@ export const Testimonials = ({
         What Our Clients Say
       </h2>
       <div className="flex flex-col items-center w-full">
-        <div
-          className="w-full flex flex-row justify-center gap-6 overflow-hidden min-h-[280px]"
-          style={{ position: 'relative' }}
-        >
-          <AnimatePresence initial={false} custom={direction} mode="wait">
-            <motion.div
-              key={currentPage}
-              className="flex flex-row gap-6 w-full justify-center"
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ type: 'tween' }}
-              style={{ width: '100%' }}
-            >
-              {currentTestimonials.map((testimonial, testimonialIndex) => (
-                <TestimonyCard
-                  key={startIndex + testimonialIndex}
-                  {...testimonial}
-                />
+        <Suspense
+          fallback={
+            <div className="w-full flex flex-row justify-center gap-6 overflow-hidden min-h-[280px]">
+              {[...Array(2)].map((_, i) => (
+                <Skeleton key={i} className="w-full max-w-sm h-64 rounded-lg" />
               ))}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+            </div>
+          }
+        >
+          <div
+            className="w-full flex flex-row justify-center gap-6 overflow-hidden min-h-[280px]"
+            style={{ position: 'relative' }}
+          >
+            <AnimatePresence initial={false} custom={direction} mode="wait">
+              <motion.div
+                key={currentPage}
+                className="flex flex-row gap-6 w-full justify-center"
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ type: 'tween' }}
+                style={{ width: '100%' }}
+              >
+                {currentTestimonials.map((testimonial, testimonialIndex) => (
+                  <TestimonyCard
+                    key={startIndex + testimonialIndex}
+                    {...testimonial}
+                  />
+                ))}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </Suspense>
         <div className="flex gap-2 mt-4">
           {Array.from({ length: totalPages }).map((_, pageIndex) => (
             <button

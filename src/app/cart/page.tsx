@@ -8,6 +8,8 @@ import { DataTable } from '@hero/components/ui/data-table'
 import { CartCoupon, CartSummary } from '@hero/components/cart'
 import { Button } from '@hero/components/ui/button'
 import { Trash } from 'lucide-react'
+import { Suspense } from 'react'
+import { Skeleton } from '@hero/components/ui/skeleton'
 
 export default function Cart() {
   const {
@@ -57,16 +59,30 @@ export default function Cart() {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row w-full gap-4 mt-8">
-          <div className="flex flex-col gap-4 w-full h-full max-w-none lg:max-w-4/6">
-            <DataTable columns={columns} data={items} />
-            <CartCoupon className="w-full" />
+        <Suspense
+          fallback={
+            <div className="flex flex-col lg:flex-row w-full gap-4 mt-8">
+              <div className="flex flex-col gap-4 w-full h-full max-w-none lg:max-w-4/6">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="w-full h-16 rounded-md mb-2" />
+                ))}
+                <Skeleton className="w-full h-24 rounded-md mt-4" />
+              </div>
+              <Skeleton className="w-full lg:w-1/4 h-64 rounded-md" />
+            </div>
+          }
+        >
+          <div className="flex flex-col lg:flex-row w-full gap-4 mt-8">
+            <div className="flex flex-col gap-4 w-full h-full max-w-none lg:max-w-4/6">
+              <DataTable columns={columns} data={items} />
+              <CartCoupon className="w-full" />
+            </div>
+            <CartSummary
+              items={selectedItems}
+              onCheckout={handleCheckoutProduct}
+            />
           </div>
-          <CartSummary
-            items={selectedItems}
-            onCheckout={handleCheckoutProduct}
-          />
-        </div>
+        </Suspense>
       </div>
       <Footer className="mt-12" />
     </div>

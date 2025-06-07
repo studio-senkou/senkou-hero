@@ -8,7 +8,8 @@ import { RangeSlider } from './ui/range-slider'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 import { cn } from '@hero/lib/utils'
 import { Product, ProductCountByCategory } from '@hero/types/dto'
-import { useMemo } from 'react'
+import { useMemo, Suspense } from 'react'
+import { Skeleton } from './ui/skeleton'
 
 interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
   product: Product
@@ -47,18 +48,30 @@ export const ProductCard = ({
           direction === 'row' && 'w-[75px] h-[75px]',
         )}
       >
-        <Image
-          src={
-            product.image && process.env.NEXT_PUBLIC_SUPABASE_S3
-              ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/products/${product.image}`
-              : 'https://placehold.in/200.webp'
+        <Suspense
+          fallback={
+            <Skeleton
+              className={
+                direction === 'column'
+                  ? 'w-[200px] h-[200px]'
+                  : 'w-[75px] h-[75px]'
+              }
+            />
           }
-          alt="Product Image"
-          sizes={direction === 'column' ? '200px' : '75px'}
-          className="rounded-md object-cover"
-          loading="lazy"
-          fill
-        />
+        >
+          <Image
+            src={
+              product.image && process.env.NEXT_PUBLIC_SUPABASE_S3
+                ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/products/${product.image}`
+                : 'https://placehold.in/200.webp'
+            }
+            alt="Product Image"
+            sizes={direction === 'column' ? '200px' : '75px'}
+            className="rounded-md object-cover"
+            loading="lazy"
+            fill
+          />
+        </Suspense>
       </div>
       <div className="flex justify-between items-center gap-2">
         <div className="flex flex-col gap-1">

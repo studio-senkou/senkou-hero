@@ -10,6 +10,9 @@ import Image from 'next/image'
 import { ProductCard } from '@hero/components/product'
 import { getBestSellingProducts, getProducts } from '@hero/lib/products'
 import { getClientsTestimony } from '@hero/lib/clients'
+import { Suspense } from 'react'
+import { Skeleton } from '@hero/components/ui/skeleton'
+import Link from 'next/link'
 
 export default async function Home() {
   const products = await getProducts()
@@ -30,27 +33,65 @@ export default async function Home() {
         <h2 className="text-3xl font-bold text-center mb-5">
           Features Products
         </h2>
-
-        <section className="flex items-start gap-4 lg:max-w-3/4 w-full mx-auto overflow-x-auto px-4">
-          {bestSellingProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </section>
-
-        <section className="flex flex-col sm:flex-row sm:justify-start items-stretch flex-wrap gap-4 w-full lg:max-w-3/4 mx-auto mt-8 px-4">
-          <div className="flex flex-col gap-4 flex-1 min-w-60">
-            <h3 className="text-xl font-semibold">Hot Deals</h3>
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} direction="row" />
+        <Suspense
+          fallback={
+            <section className="flex items-start gap-4 lg:max-w-3/4 w-full mx-auto overflow-x-auto px-4">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="w-60 h-72 rounded-md" />
+              ))}
+            </section>
+          }
+        >
+          {/* Best Selling Products */}
+          <section className="flex items-start gap-4 lg:max-w-3/4 w-full mx-auto overflow-x-auto px-4">
+            {bestSellingProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
-          </div>
-          <div className="flex flex-col gap-4 flex-1 min-w-60">
-            <h3 className="text-xl font-semibold">Hot Deals</h3>
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} direction="row" />
-            ))}
-          </div>
-        </section>
+          </section>
+        </Suspense>
+
+        <Suspense
+          fallback={
+            <section className="flex flex-col sm:flex-row sm:justify-start items-stretch flex-wrap gap-4 w-full lg:max-w-3/4 mx-auto mt-8 px-4">
+              <div className="flex flex-col gap-4 flex-1 min-w-60">
+                <h3 className="text-xl font-semibold">Hot Deals</h3>
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="w-full h-24 rounded-md mb-2" />
+                ))}
+              </div>
+              <div className="flex flex-col gap-4 flex-1 min-w-60">
+                <h3 className="text-xl font-semibold">Hot Deals</h3>
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="w-full h-24 rounded-md mb-2" />
+                ))}
+              </div>
+            </section>
+          }
+        >
+          {/* All Products */}
+          <section className="flex flex-col sm:flex-row sm:justify-start items-stretch flex-wrap gap-4 w-full lg:max-w-3/4 mx-auto mt-8 px-4">
+            <div className="flex flex-col gap-4 flex-1 min-w-60">
+              <h3 className="text-xl font-semibold">Hot Deals</h3>
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  direction="row"
+                />
+              ))}
+            </div>
+            <div className="flex flex-col gap-4 flex-1 min-w-60">
+              <h3 className="text-xl font-semibold">Hot Deals</h3>
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  direction="row"
+                />
+              ))}
+            </div>
+          </section>
+        </Suspense>
       </div>
 
       <div className="min-w-screen bg-[#F0F5F1] p-4 md:p-16 mt-20">
@@ -125,15 +166,26 @@ export default async function Home() {
                 </div>
               </div>
             </div>
-            <Button className="flex items-center max-w-fit rounded-full bg-[#00B207] mt-5 text-md font-normal hover:bg-[#00b206bb] text-white px-4 py-2">
+            <Link
+              href="/products"
+              className="flex items-center max-w-fit rounded-full bg-[#00B207] mt-5 text-md font-normal hover:bg-[#00b206bb] text-white px-4 py-2"
+            >
               Shop Now
               <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            </Link>
           </div>
         </div>
       </div>
 
-      <Testimonials className="my-20" testimonials={testimonials} />
+      <Suspense
+        fallback={
+          <div className="my-20">
+            <Skeleton className="w-full h-64 rounded-md" />
+          </div>
+        }
+      >
+        <Testimonials className="my-20" testimonials={testimonials} />
+      </Suspense>
       <Footer />
     </div>
   )

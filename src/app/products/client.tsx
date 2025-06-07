@@ -19,7 +19,8 @@ import { useProductFilter } from '@hero/hooks/use-product-filter'
 import { Product, ProductCountByCategory } from '@hero/types/dto'
 import { GitPullRequestDraft } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, Suspense } from 'react'
+import { Skeleton } from '@hero/components/ui/skeleton'
 
 interface ProductsClientPageProps {
   products: Array<Product>
@@ -58,7 +59,45 @@ export default function ProductsClientPage({
     }
   }, [isFilterHydrated, hydrateFilterStore, initialFilter])
 
-  if (!isFilterHydrated) return null
+  if (!isFilterHydrated) {
+    // Show skeletons for filter panel and product grid while hydrating
+    return (
+      <div className="flex flex-col items-center justify-center w-full mt-40 overflow-hidden">
+        <Navbar />
+        <div className="flex w-full lg:max-w-3/4 gap-8 px-8">
+          <div className="w-1/5 hidden lg:block">
+            <aside>
+              <Skeleton className="w-full h-40 rounded-md mb-4" />
+              <Skeleton className="w-full h-80 rounded-md" />
+            </aside>
+          </div>
+          <div className="flex-1 flex flex-col">
+            <div className="flex gap-4 items-center w-full mb-6">
+              <div className="flex items-center gap-2 lg:hidden">
+                <Skeleton className="w-32 h-12 rounded-md" />
+              </div>
+              <div className="flex items-center gap-2 flex-1">
+                <Skeleton className="w-24 h-8 rounded-md" />
+                <Skeleton className="w-32 h-8 rounded-md" />
+              </div>
+              <div className="hidden lg:flex items-center gap-4 text-neutral-400">
+                <Skeleton className="w-24 h-8 rounded-md" />
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
+              {[...Array(6)].map((_, i) => (
+                <Skeleton
+                  key={i}
+                  className="w-full min-w-[15rem] h-64 rounded-md"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+        <Footer className="mt-24" />
+      </div>
+    )
+  }
 
   const handleCategoryChange = (categoryName: string) => {
     const currentCategory = searchParams.get('category')
@@ -199,17 +238,30 @@ export default function ProductsClientPage({
               </h4>
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
-            {products.map((product, index) => (
-              <div key={index} className="w-full min-w-[15rem] max-w-[0rem]">
-                <ProductCard
-                  product={{ ...product, unit: '500mg' }}
-                  onStoreCart={handleAddProductToCart}
-                  direction="column"
-                />
+          <Suspense
+            fallback={
+              <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
+                {[...Array(6)].map((_, i) => (
+                  <Skeleton
+                    key={i}
+                    className="w-full min-w-[15rem] h-64 rounded-md"
+                  />
+                ))}
               </div>
-            ))}
-          </div>
+            }
+          >
+            <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
+              {products.map((product, index) => (
+                <div key={index} className="w-full min-w-[15rem] max-w-[0rem]">
+                  <ProductCard
+                    product={{ ...product, unit: '500mg' }}
+                    onStoreCart={handleAddProductToCart}
+                    direction="column"
+                  />
+                </div>
+              ))}
+            </div>
+          </Suspense>
         </div>
       </div>
 

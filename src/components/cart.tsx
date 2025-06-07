@@ -4,10 +4,11 @@ import { cn } from '@hero/lib/utils'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { CartItem } from '@hero/types/dto'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, Suspense } from 'react'
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import Image from 'next/image'
 import { toast } from 'sonner'
+import { Skeleton } from './ui/skeleton'
 
 interface CartSummaryProps {
   items: Array<CartItem>
@@ -95,37 +96,41 @@ export const CartSummary = ({ items = [], onCheckout }: CartSummaryProps) => {
           <div className="w-12 h-1.5 bg-neutral-300 rounded-full mb-4" />
           <div className="!max-w-md w-full">
             <div className="p-2 w-full">
-              {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between mb-4"
-                >
-                  <div className="flex items-center">
-                    <Image
-                      src={
-                        item.image
-                          ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/products/${item.image}`
-                          : 'https://placehold.in/200.webp'
-                      }
-                      alt={item.name}
-                      width={50}
-                      height={50}
-                      className="rounded-md mr-4 mb-4"
-                      loading="lazy"
-                      unoptimized
-                    />
-                    <div>
-                      <h3 className="text-md font-medium">{item.name}</h3>
-                      <p className="text-sm text-neutral-500">
-                        Price: ${item.price.toFixed(2)}
-                      </p>
+              <Suspense
+                fallback={<Skeleton className="w-full h-16 rounded-md mb-2" />}
+              >
+                {items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between mb-4"
+                  >
+                    <div className="flex items-center">
+                      <Image
+                        src={
+                          item.image
+                            ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/products/${item.image}`
+                            : 'https://placehold.in/200.webp'
+                        }
+                        alt={item.name}
+                        width={50}
+                        height={50}
+                        className="rounded-md mr-4 mb-4"
+                        loading="lazy"
+                        unoptimized
+                      />
+                      <div>
+                        <h3 className="text-md font-medium">{item.name}</h3>
+                        <p className="text-sm text-neutral-500">
+                          Price: ${item.price.toFixed(2)}
+                        </p>
+                      </div>
                     </div>
+                    <span className="text-sm font-medium ml-4">
+                      x {item.quantity}
+                    </span>
                   </div>
-                  <span className="text-sm font-medium ml-4">
-                    x {item.quantity}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </Suspense>
             </div>
             <div className="w-full mt-4 text-sm text-neutral-700">
               <div className="flex justify-between items-center mb-2">
@@ -159,23 +164,25 @@ export const CartCoupon = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <div
-      className={cn(
-        'flex flex-col lg:flex-row lg:items-center lg:justify-between p-4 border rounded-md',
-        className,
-      )}
-      {...props}
-    >
-      <h2 className="text-lg font-medium">Coupon Code</h2>
-      <div className="relative w-full max-w-none lg:max-w-xl p-5 lg:p-0">
-        <Input
-          className="bg-white rounded-full p-5 placeholder:text-neutral-400 w-full"
-          placeholder="Enter code"
-        />
-        <Button className="absolute top-1/2 right-0 -translate-y-1/2 text-white rounded-full px-8 py-5 font-regular transition cursor-pointer">
-          Apply Coupon
-        </Button>
+    <Suspense fallback={<Skeleton className="w-full h-24 rounded-md" />}>
+      <div
+        className={cn(
+          'flex flex-col lg:flex-row lg:items-center lg:justify-between p-4 border rounded-md',
+          className,
+        )}
+        {...props}
+      >
+        <h2 className="text-lg font-medium">Coupon Code</h2>
+        <div className="relative w-full max-w-none lg:max-w-xl p-5 lg:p-0">
+          <Input
+            className="bg-white rounded-full p-5 placeholder:text-neutral-400 w-full"
+            placeholder="Enter code"
+          />
+          <Button className="absolute top-1/2 right-0 -translate-y-1/2 text-white rounded-full px-8 py-5 font-regular transition cursor-pointer">
+            Apply Coupon
+          </Button>
+        </div>
       </div>
-    </div>
+    </Suspense>
   )
 }
