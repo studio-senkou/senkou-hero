@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "X-Frame-Options", "value": "SAMEORIGIN" }]
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false,
+
+  "framework": "nextjs",
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm run build"
+}
