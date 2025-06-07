@@ -41,7 +41,7 @@ export const CartSummary = ({ items = [], onCheckout }: CartSummaryProps) => {
         `Total: $${total.toFixed(2)}\n\n` +
         `Could you please confirm my order? Thank you!`,
     )
-    const whatsappUrl = `https://wa.me/?text=${message}`
+    const whatsappUrl = `https://wa.me/${process.env.NEXT_PUBLIC_PHONE_NUMBER}?text=${message}`
     onCheckout?.(items.map((item) => item.id))
     setSheetOpen(false)
     window.open(whatsappUrl, '_blank')
