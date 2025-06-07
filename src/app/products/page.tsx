@@ -2,6 +2,7 @@ import {
   getProductCountByCategories,
   getProductPriceRanges,
   getProducts,
+  getProductTags,
 } from '@hero/lib/products'
 import ProductsClientPage from './client'
 
@@ -22,7 +23,14 @@ export default async function ProductsPage({
         ? parseInt(params['price[max]'] as string)
         : Number.MAX_SAFE_INTEGER,
     },
+    tag: params.tag
+      ? Array.isArray(params.tag)
+        ? params.tag
+        : [params.tag]
+      : [],
+    sortBy: params.sort as 'latest' | 'price' | 'discount',
   })
+  const tags = await getProductTags()
   const categories = await getProductCountByCategories()
   const productPriceRanges = await getProductPriceRanges()
 
@@ -30,9 +38,18 @@ export default async function ProductsPage({
     <ProductsClientPage
       products={products}
       categories={categories}
+      sortBy={params.sort!}
+      tags={
+        params.tag
+          ? Array.isArray(params.tag)
+            ? params.tag
+            : [params.tag]
+          : []
+      }
       filter={{
         category: params.category,
         price: productPriceRanges,
+        tags,
       }}
     />
   )

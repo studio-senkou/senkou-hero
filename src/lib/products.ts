@@ -4,44 +4,32 @@ import type {
   Product,
   ProductCountByCategory,
   ProductPriceRange,
+  ProductTag,
 } from '@hero/types/dto'
 import { supabase } from './supabase'
 
 interface ProductParams {
   category?: string
   price?: ProductPriceRange
+  tag?: string | Array<string>
+  sortBy?: 'latest' | 'price' | 'discount'
 }
 
 export const getProducts = async ({
   category,
   price,
+  tag,
+  sortBy = 'latest',
 }: ProductParams = {}): Promise<Array<Product>> => {
   try {
     const { data, error } = await supabase
       .from('products')
       .select(
-        `
-        *,
-        product_categories (
-          id,
-          category_id,
-          category:category_id (
-            id,
-            name,
-            description
-          )
-        ),
-        product_tags (
-          id,
-          tag_id,
-          tags:tag_id (
-            id,
-            name
-          )
-        )
-      `,
+        '*, product_categories(*, category:category_id(*)), product_tags(*, tags:tag_id(*))',
       )
-      .order('created_at', { ascending: false })
+      .order(sortBy === 'latest' ? 'created_at' : sortBy, {
+        ascending: sortBy !== 'latest',
+      })
 
     if (error) {
       throw error
@@ -66,7 +54,31 @@ export const getProducts = async ({
         : true
     })
 
-    return priceRangedProducts
+    if (priceRangedProducts.length === 0) {
+      throw new Error('No products found in the specified price range')
+    }
+
+    const taggedProducts = priceRangedProducts.filter((product) => {
+      if (!product.product_tags || !product.product_tags.length) {
+        return true
+      }
+
+      if (typeof tag === 'string') {
+        return product.product_tags.some(
+          (productTag) => productTag.name === tag,
+        )
+      }
+
+      if (Array.isArray(tag)) {
+        return product.product_tags.some((productTag) =>
+          tag.includes(productTag.name),
+        )
+      }
+
+      return true
+    })
+
+    return taggedProducts
   } catch {
     return []
   }
@@ -146,5 +158,19 @@ export const getProductPriceRanges = async (): Promise<ProductPriceRange> => {
     return data?.[0] as ProductPriceRange
   } catch {
     return { min: 0, max: 0 }
+  }
+}
+
+export const getProductTags = async (): Promise<Array<ProductTag>> => {
+  try {
+    const { data, error } = await supabase.from('tags').select('*')
+
+    if (error) {
+      throw error
+    }
+
+    return data
+  } catch {
+    return []
   }
 }

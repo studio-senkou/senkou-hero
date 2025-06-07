@@ -1,9 +1,17 @@
+'use client'
+
 import Image from 'next/image'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { FOOTER_LINKS, SOCIAL_LINKS } from '@hero/constants/footer'
 import Link from 'next/link'
 import { cn } from '@hero/lib/utils'
+import { useTransition, useState } from 'react'
+import { subscribe } from '@hero/lib/subscription'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 
 export const Footer = ({
   className,
@@ -30,15 +38,7 @@ export const Footer = ({
                 Lorem Ipsum is simply dummy text of the printing.
               </p>
             </div>
-            <div className="relative w-full max-w-xs p-5 lg:p-0">
-              <Input
-                className="bg-white rounded-full pr-28 placeholder:text-neutral-400 w-full"
-                placeholder="Your email address"
-              />
-              <Button className="absolute top-1/2 right-0 -translate-y-1/2 bg-[#00B207] text-white rounded-full px-4 py-2 font-regular hover:bg-[#00b206bb] transition">
-                Subscribe
-              </Button>
-            </div>
+            <NewsletterSubscribeForm />
           </div>
         </div>
       </section>
@@ -92,5 +92,70 @@ export const Footer = ({
         </div>
       </div>
     </footer>
+  )
+}
+
+const newsletterSchema = z.object({
+  email: z.string().email('Please enter a valid email address.'),
+})
+
+function NewsletterSubscribeForm() {
+  const [isPending, startTransition] = useTransition()
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(newsletterSchema),
+    defaultValues: { email: '' },
+  })
+
+  const onSubmit = (data: z.infer<typeof newsletterSchema>) => {
+    startTransition(async () => {
+      try {
+        await subscribe(data.email)
+        reset()
+      } catch (err) {
+        toast.error('Subscription failed', {
+          description: 'Please try again later.',
+          duration: 3000,
+        })
+      }
+    })
+  }
+
+  return (
+    <form
+      className="relative w-full max-w-xs p-5 lg:p-0"
+      onSubmit={handleSubmit((data) => {
+        onSubmit(data)
+        if (Object.keys(errors).length === 0) {
+          toast('Subscribed successfully!', {
+            description: 'Thank you for subscribing to our newsletter.',
+            duration: 3000,
+          })
+        }
+      })}
+    >
+      <Input
+        className={cn(
+          'bg-white rounded-full pr-28 placeholder:text-neutral-400 w-full',
+          errors.email && 'border border-red-500',
+        )}
+        placeholder="Your email address"
+        type="email"
+        autoComplete="email"
+        disabled={isPending}
+        {...register('email')}
+      />
+      <Button
+        className="absolute top-1/2 right-0 -translate-y-1/2 bg-[#00B207] text-white rounded-full px-4 py-2 font-regular hover:bg-[#00b206bb] transition"
+        type="submit"
+        disabled={isPending}
+      >
+        {isPending ? 'Subscribing...' : 'Subscribe'}
+      </Button>
+    </form>
   )
 }

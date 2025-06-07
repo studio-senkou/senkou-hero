@@ -16,7 +16,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@hero/components/ui/sheet'
 import { useCart } from '@hero/hooks/use-cart'
 import { useProductFilter } from '@hero/hooks/use-product-filter'
-import { Product, ProductCountByCategory } from '@hero/types/dto'
+import { Product, ProductCountByCategory, ProductTag } from '@hero/types/dto'
 import { GitPullRequestDraft } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, Suspense } from 'react'
@@ -25,18 +25,23 @@ import { Skeleton } from '@hero/components/ui/skeleton'
 interface ProductsClientPageProps {
   products: Array<Product>
   categories: Array<ProductCountByCategory>
+  sortBy: string
+  tags: Array<string>
   filter?: {
     category?: string
     price?: {
       min: number
       max: number
     }
+    tags: Array<ProductTag>
   }
 }
 
 export default function ProductsClientPage({
   products,
   categories = [],
+  sortBy,
+  tags = [],
   filter: initialFilter,
 }: ProductsClientPageProps) {
   const router = useRouter()
@@ -60,7 +65,6 @@ export default function ProductsClientPage({
   }, [isFilterHydrated, hydrateFilterStore, initialFilter])
 
   if (!isFilterHydrated) {
-    // Show skeletons for filter panel and product grid while hydrating
     return (
       <div className="flex flex-col items-center justify-center w-full mt-40 overflow-hidden">
         <Navbar />
@@ -153,6 +157,30 @@ export default function ProductsClientPage({
     })
   }
 
+  const handleTagChange = (tag: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    const currentTags = params.getAll('tag')
+
+    if (currentTags.includes(tag)) {
+      const newTags = currentTags.filter((t) => t !== tag)
+      params.delete('tag')
+      newTags.forEach((t) => params.append('tag', t))
+    } else {
+      params.append('tag', tag)
+    }
+
+    router?.push(`/products?${params.toString()}`)
+  }
+
+  const handleSortByChange = (sortType: string) => {
+    const currentSortType = searchParams.get('sort')
+    if (currentSortType === sortType) return
+
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('sort', sortType)
+    router?.push(`/products?${params.toString()}`)
+  }
+
   return (
     <div className="flex flex-col items-center justify-center w-full mt-40 overflow-hidden">
       <Navbar />
@@ -178,6 +206,11 @@ export default function ProductsClientPage({
                 maxPrice: currentPrice.max,
                 setMinPrice: handleChangeMinPrice,
                 setMaxPrice: handleChangeMaxPrice,
+              }}
+              tag={{
+                tags: initialFilter?.tags || [],
+                selectedTags: tags,
+                onSelectTag: handleTagChange,
               }}
             />
           </aside>
@@ -207,22 +240,24 @@ export default function ProductsClientPage({
                       setMinPrice: handleChangeMinPrice,
                       setMaxPrice: handleChangeMaxPrice,
                     }}
+                    tag={{
+                      tags: initialFilter?.tags || [],
+                      selectedTags: tags,
+                      onSelectTag: handleTagChange,
+                    }}
                   />
                 </SheetContent>
               </Sheet>
             </div>
             <div className="flex items-center gap-2 flex-1">
               <p className="text-neutral-400 font-medium">Sort by: </p>
-              <Select defaultValue="latest">
+              <Select defaultValue={sortBy} onValueChange={handleSortByChange}>
                 <SelectTrigger className="min-w-[120px]">
                   <SelectValue placeholder="Select your veggie" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectLabel>Latest</SelectLabel>
                     <SelectItem value="latest">Latest</SelectItem>
-                    <SelectItem value="popular">Popular</SelectItem>
-                    <SelectItem value="featured">Featured</SelectItem>
                     <SelectItem value="price">Price</SelectItem>
                     <SelectItem value="discount">Discount</SelectItem>
                   </SelectGroup>

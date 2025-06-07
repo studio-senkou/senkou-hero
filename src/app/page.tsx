@@ -8,13 +8,14 @@ import { ArrowRight, Check } from 'lucide-react'
 import Image from 'next/image'
 import { ProductCard } from '@hero/components/product'
 import { getBestSellingProducts, getProducts } from '@hero/lib/products'
-import { getClientsTestimony } from '@hero/lib/clients'
+import { getClients, getClientsTestimony } from '@hero/lib/clients'
 import { Suspense } from 'react'
 import { Skeleton } from '@hero/components/ui/skeleton'
 import Link from 'next/link'
 
 export default async function Home() {
   const products = await getProducts()
+  const clients = await getClients(5)
   const bestSellingProducts = await getBestSellingProducts()
   const testimonials = await getClientsTestimony()
 
@@ -26,7 +27,7 @@ export default async function Home() {
         <Services className="mt-8 lg:max-w-3/5 lg:relative lg:top-1/2 lg:left-1/2 lg:-translate-1/2 lg:shadow-lg lg:rounded-lg" />
       </div>
 
-      <Partners className="mt-20" />
+      <Partners className="mt-20" partners={clients} />
 
       <div className="flex flex-col items-center justify-center mt-20 w-full">
         <h2 className="text-3xl font-bold text-center mb-5">

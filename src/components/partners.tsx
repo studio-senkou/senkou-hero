@@ -1,13 +1,14 @@
-import { PARTNERS } from '@hero/constants/partner'
 import { cn } from '@hero/lib/utils'
 import Image from 'next/image'
-import { Suspense } from 'react'
+import { ComponentProps, Suspense } from 'react'
 import { Skeleton } from './ui/skeleton'
+import { Client } from '@hero/types/dto'
 
-export const Partners = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => {
+interface PartnerProps extends ComponentProps<'div'> {
+  partners: Array<Client>
+}
+
+export const Partners = ({ className, partners, ...props }: PartnerProps) => {
   return (
     <div
       className={cn(
@@ -21,12 +22,17 @@ export const Partners = ({
           <Skeleton key={i} className="w-[100px] h-[100px] rounded-full" />
         ))}
       >
-        {PARTNERS.map((partner, index) => (
+        {partners.map((partner, index) => (
           <div key={index} className="flex items-center cursor-pointer">
             <div className="transition-all duration-300 filter grayscale hover:grayscale-0">
               <Image
-                src={partner.logoPath}
-                alt={partner.name}
+                src={
+                  partner.organization_image &&
+                  process.env.NEXT_PUBLIC_SUPABASE_S3
+                    ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${partner.organization_image}`
+                    : 'https://placehold.in/200.webp'
+                }
+                alt={partner.organization_name ?? 'Client Logo'}
                 width={100}
                 height={100}
               />

@@ -1,9 +1,12 @@
 import { Client, Testimony } from '@hero/types/dto'
 import { supabase } from './supabase'
 
-export const getClients = async (): Promise<Array<Client>> => {
+export const getClients = async (limit?: number): Promise<Array<Client>> => {
   try {
-    const { data, error } = await supabase.from('clients').select('*')
+    const { data, error } = await supabase
+      .from('clients')
+      .select('*')
+      .limit(limit || 100)
 
     if (error) {
       throw error

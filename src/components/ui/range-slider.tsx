@@ -41,16 +41,27 @@ export function RangeSlider({
     onChange(newValues)
   }
 
-  const startDragging = (index: 0 | 1) => (e: React.MouseEvent) => {
-    e.preventDefault()
-    const move = (e: MouseEvent) => handleThumbMove(index, e.clientX)
-    const stop = () => {
-      window.removeEventListener('mousemove', move)
-      window.removeEventListener('mouseup', stop)
+  const startDragging =
+    (index: 0 | 1) => (e: React.MouseEvent | React.TouchEvent) => {
+      e.preventDefault()
+
+      const move = (e: MouseEvent | TouchEvent) => {
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+        handleThumbMove(index, clientX)
+      }
+
+      const stop = () => {
+        window.removeEventListener('mousemove', move as any)
+        window.removeEventListener('mouseup', stop)
+        window.removeEventListener('touchmove', move as any)
+        window.removeEventListener('touchend', stop)
+      }
+
+      window.addEventListener('mousemove', move as any)
+      window.addEventListener('mouseup', stop)
+      window.addEventListener('touchmove', move as any)
+      window.addEventListener('touchend', stop)
     }
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mouseup', stop)
-  }
 
   return (
     <div className={cn('relative h-6 w-full', className)}>
@@ -73,6 +84,7 @@ export function RangeSlider({
           className="absolute top-1/2 h-4 w-4 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-[#00B207] bg-white shadow cursor-pointer"
           style={{ left: `${getPercent(values[i as 0 | 1])}%` }}
           onMouseDown={startDragging(i as 0 | 1)}
+          onTouchStart={startDragging(i as 0 | 1)}
         />
       ))}
     </div>

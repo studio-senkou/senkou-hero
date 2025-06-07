@@ -1,13 +1,13 @@
 'use client'
 
 import Image from 'next/image'
-import { ShoppingBag } from 'lucide-react'
+import { ShoppingBag, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Label } from './ui/label'
 import { RangeSlider } from './ui/range-slider'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 import { cn } from '@hero/lib/utils'
-import { Product, ProductCountByCategory } from '@hero/types/dto'
+import { Product, ProductCountByCategory, ProductTag } from '@hero/types/dto'
 import { useMemo, Suspense } from 'react'
 import { Skeleton } from './ui/skeleton'
 
@@ -105,6 +105,7 @@ export const ProductCard = ({
             className="bg-neutral-100 rounded-full p-2 cursor-pointer hover:bg-neutral-200 relative overflow-visible"
             onClick={(e) => {
               onStoreCart?.(product)
+
               const img = e.currentTarget.closest('div')
               const cartIcon = e.currentTarget
               if (img && cartIcon) {
@@ -155,12 +156,23 @@ interface PriceFilterProps {
   setMaxPrice: (value: number) => void
 }
 
+interface TagFilterProps {
+  tags: Array<ProductTag>
+  selectedTags?: Array<string>
+  onSelectTag: (tag: string) => void
+}
+
 interface FilterPanelItemProps {
   category?: CategoryFilterProps
   price?: PriceFilterProps
+  tag?: TagFilterProps
 }
 
-export const FilterPanelItem = ({ category, price }: FilterPanelItemProps) => {
+export const FilterPanelItem = ({
+  category,
+  price,
+  tag,
+}: FilterPanelItemProps) => {
   return (
     <>
       <div className="mt-4">
@@ -225,21 +237,28 @@ export const FilterPanelItem = ({ category, price }: FilterPanelItemProps) => {
         <h2 className="text-xl">Popular Tag</h2>
 
         <div className="flex flex-wrap gap-2 mt-4">
-          {['Fresh', 'Fruit', 'Vegetables', 'Cooking', 'Snacks'].map((tag) => (
-            <Button
-              key={tag}
-              variant="outline"
-              className="rounded-full px-4 py-2 text-sm font-light cursor-pointer hover:bg-neutral-100"
-            >
-              {tag}
-            </Button>
-          ))}
-          <Button
-            variant="outline"
-            className="rounded-full px-4 py-2 text-sm font-light"
-          >
-            Show More
-          </Button>
+          {tag?.tags.map((t) => {
+            const isSelected = tag.selectedTags?.includes(t.name)
+            return (
+              <Button
+                key={t.id}
+                variant={isSelected ? 'secondary' : 'outline'}
+                className={cn(
+                  'rounded-full px-4 py-2 text-sm font-light cursor-pointer capitalize flex items-center gap-1',
+                  isSelected
+                    ? 'bg-green-100 text-green-700 border-green-400 hover:bg-green-200'
+                    : 'hover:bg-neutral-100',
+                )}
+                onClick={() => tag.onSelectTag(t.name)}
+              >
+                {t.name}
+                {isSelected && <X className="ml-2" />}
+              </Button>
+            )
+          })}
+          {tag?.tags.length === 0 && (
+            <span className="text-sm text-neutral-400">No tags available</span>
+          )}
         </div>
       </div>
     </>
