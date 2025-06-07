@@ -2,7 +2,9 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 type StoreStateOnly<T> = {
-  [K in keyof T as T[K] extends Function ? never : K]: T[K]
+  [K in keyof T as T[K] extends (...args: unknown[]) => unknown
+    ? never
+    : K]: T[K]
 }
 
 interface ProductFilterStore {

@@ -40,7 +40,11 @@ export const cartColumns = ({
         checked={isItemSelected(row.original.id)}
         onCheckedChange={(value) => {
           row.toggleSelected(!!value)
-          value ? onSelect(row.original.id) : onDeselect(row.original.id)
+          if (value) {
+            onSelect(row.original.id)
+          } else {
+            onDeselect(row.original.id)
+          }
         }}
         aria-label="Select row"
       />

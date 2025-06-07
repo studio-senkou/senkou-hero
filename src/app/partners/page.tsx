@@ -1,10 +1,10 @@
 import { Footer } from '@hero/components/footer'
 import { Navbar } from '@hero/components/ui/navbar'
-import { getPartners } from '@hero/lib/partners'
+import { getClients } from '@hero/lib/clients'
 import Image from 'next/image'
 
 export default async function Partners() {
-  const partners = await getPartners()
+  const partners = await getClients()
 
   return (
     <div className="flex flex-col items-center justify-center w-full mt-40 overflow-hidden">
@@ -30,16 +30,24 @@ export default async function Partners() {
             className="relative flex flex-col items-center justify-center w-72 p-12 cursor-pointer mt-8 border border-neutral-200 rounded-lg group"
           >
             <Image
-              src={partner.logo}
-              alt={partner.name}
+              src={
+                partner.organization_image &&
+                process.env.NEXT_PUBLIC_SUPABASE_S3
+                  ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${partner.organization_image}`
+                  : 'https://placehold.in/150x100.webp'
+              }
+              alt={partner.organization_name ?? 'Partner Image'}
               width={150}
               height={100}
               className="object-contain transition-opacity duration-300 group-hover:opacity-0"
             />
             <div className="absolute inset-0 flex flex-col items-start justify-center px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <h2 className="text-2xl font-semibold">{partner.name}</h2>
+              <h2 className="text-2xl font-semibold">
+                {partner.organization_name}
+              </h2>
               <p className="text-sm mt-3 text-neutral-400">
-                {partner.description}
+                {/* {partner.description} */}
+                Description
               </p>
             </div>
           </div>

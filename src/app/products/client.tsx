@@ -56,7 +56,7 @@ export default function ProductsClientPage({
         tags: [],
       })
     }
-  }, [isFilterHydrated, hydrateFilterStore, initialFilter?.price])
+  }, [isFilterHydrated, hydrateFilterStore, initialFilter])
 
   if (!isFilterHydrated) return null
 

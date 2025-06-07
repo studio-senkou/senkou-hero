@@ -9,7 +9,6 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 import { cn } from '@hero/lib/utils'
 import { Product, ProductCountByCategory } from '@hero/types/dto'
 import { useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 
 interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
   product: Product

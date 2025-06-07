@@ -1,5 +1,19 @@
-import { Testimony } from '@hero/types/dto'
+import { Client, Testimony } from '@hero/types/dto'
 import { supabase } from './supabase'
+
+export const getClients = async (): Promise<Array<Client>> => {
+  try {
+    const { data, error } = await supabase.from('clients').select('*')
+
+    if (error) {
+      throw error
+    }
+
+    return data as Array<Client>
+  } catch {
+    return []
+  }
+}
 
 export const getClientsTestimony = async (): Promise<Array<Testimony>> => {
   try {
@@ -21,7 +35,7 @@ export const getClientsTestimony = async (): Promise<Array<Testimony>> => {
       .order('created_at', { ascending: false })
 
     return response.data as unknown as Array<Testimony>
-  } catch (error) {
+  } catch {
     return []
   }
 }
