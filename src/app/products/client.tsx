@@ -18,7 +18,7 @@ import { useProductFilter } from '@hero/hooks/use-product-filter'
 import { Product, ProductCountByCategory, ProductTag } from '@hero/types/dto'
 import { GitPullRequestDraft } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef, Suspense } from 'react'
+import { useEffect, useRef, useState, Suspense } from 'react'
 import { Skeleton } from '@hero/components/ui/skeleton'
 
 interface ProductsClientPageProps {
@@ -43,6 +43,7 @@ export default function ProductsClientPage({
   tags = [],
   filter: initialFilter,
 }: ProductsClientPageProps) {
+  const [isProductLoading, setIsProductLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -63,55 +64,18 @@ export default function ProductsClientPage({
     }
   }, [isFilterHydrated, hydrateFilterStore, initialFilter])
 
-  if (!isFilterHydrated) {
-    return (
-      <div className="flex flex-col items-center justify-center w-full mt-40 overflow-hidden">
-        <Navbar />
-        <div className="flex w-full lg:max-w-3/4 gap-8 px-8">
-          <div className="w-1/5 hidden lg:block">
-            <aside>
-              <Skeleton className="w-full h-40 rounded-md mb-4" />
-              <Skeleton className="w-full h-80 rounded-md" />
-            </aside>
-          </div>
-          <div className="flex-1 flex flex-col">
-            <div className="flex gap-4 items-center w-full mb-6">
-              <div className="flex items-center gap-2 lg:hidden">
-                <Skeleton className="w-32 h-12 rounded-md" />
-              </div>
-              <div className="flex items-center gap-2 flex-1">
-                <Skeleton className="w-24 h-8 rounded-md" />
-                <Skeleton className="w-32 h-8 rounded-md" />
-              </div>
-              <div className="hidden lg:flex items-center gap-4 text-neutral-400">
-                <Skeleton className="w-24 h-8 rounded-md" />
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
-              {[...Array(6)].map((_, i) => (
-                <Skeleton
-                  key={i}
-                  className="w-full min-w-[15rem] h-64 rounded-md"
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-        <Footer className="mt-24" />
-      </div>
-    )
-  }
-
   const handleCategoryChange = (categoryName: string) => {
     const currentCategory = searchParams.get('category')
     if (currentCategory === categoryName) return
 
+    setIsProductLoading(true)
     const params = new URLSearchParams(searchParams.toString())
     params.set('category', categoryName)
     router?.push(`/products?${params.toString()}`)
   }
 
   const pushPriceFilterToRouter = () => {
+    setIsProductLoading(true)
     const params = new URLSearchParams(searchParams.toString())
     if (pendingPriceRef.current.min !== undefined) {
       params.set('price[min]', pendingPriceRef.current.min.toString())
@@ -126,7 +90,7 @@ export default function ProductsClientPage({
     if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current)
     debounceTimeoutRef.current = setTimeout(() => {
       pushPriceFilterToRouter()
-    }, 500)
+    }, 100)
   }
 
   const handleChangeMinPrice = (min: number) => {
@@ -157,6 +121,7 @@ export default function ProductsClientPage({
   }
 
   const handleTagChange = (tag: string) => {
+    setIsProductLoading(true)
     const params = new URLSearchParams(searchParams.toString())
     const currentTags = params.getAll('tag')
 
@@ -175,10 +140,15 @@ export default function ProductsClientPage({
     const currentSortType = searchParams.get('sort')
     if (currentSortType === sortType) return
 
+    setIsProductLoading(true)
     const params = new URLSearchParams(searchParams.toString())
     params.set('sort', sortType)
     router?.push(`/products?${params.toString()}`)
   }
+
+  useEffect(() => {
+    setIsProductLoading(false)
+  }, [products])
 
   return (
     <div className="flex flex-col items-center justify-center w-full mt-40 overflow-hidden">
@@ -192,26 +162,36 @@ export default function ProductsClientPage({
               <GitPullRequestDraft />
             </Button>
 
-            <FilterPanelItem
-              category={{
-                categories: categories,
-                selectedCategory: initialFilter?.category,
-                onCategoryChange: handleCategoryChange,
-              }}
-              price={{
-                originalMinPrice: initialFilter?.price?.min || 0,
-                originalMaxPrice: initialFilter?.price?.max || 0,
-                minPrice: currentPrice.min,
-                maxPrice: currentPrice.max,
-                setMinPrice: handleChangeMinPrice,
-                setMaxPrice: handleChangeMaxPrice,
-              }}
-              tag={{
-                tags: initialFilter?.tags || [],
-                selectedTags: tags,
-                onSelectTag: handleTagChange,
-              }}
-            />
+            {!isFilterHydrated || isProductLoading ? (
+              <div className="flex flex-col gap-4 mt-5">
+                <Skeleton className="w-32 h-10 rounded-md" />
+                <Skeleton className="w-full h-32 rounded-md" />
+                <Skeleton className="w-full h-16 rounded-md" />
+                <Skeleton className="w-full h-10 rounded-md" />
+              </div>
+            ) : (
+              <FilterPanelItem
+                category={{
+                  categories: categories,
+                  selectedCategory: initialFilter?.category,
+                  onCategoryChange: handleCategoryChange,
+                }}
+                price={{
+                  originalMinPrice: initialFilter?.price?.min || 0,
+                  originalMaxPrice: initialFilter?.price?.max || 0,
+                  minPrice: currentPrice.min,
+                  maxPrice: currentPrice.max,
+                  setMinPrice: handleChangeMinPrice,
+                  setMaxPrice: handleChangeMaxPrice,
+                }}
+                tag={{
+                  tags: initialFilter?.tags || [],
+                  selectedTags: tags,
+                  onSelectTag: handleTagChange,
+                }}
+                disabled={isProductLoading}
+              />
+            )}
           </aside>
         </div>
         <div className="flex-1 flex flex-col">
@@ -219,7 +199,10 @@ export default function ProductsClientPage({
             <div className="flex items-center gap-2 lg:hidden">
               <Sheet defaultOpen={false}>
                 <SheetTrigger asChild className="inline-flex">
-                  <Button className="flex items-center px-8 py-4 bg-[#00B207] text-white rounded-full">
+                  <Button
+                    className="flex items-center px-8 py-4 bg-[#00B207] text-white rounded-full"
+                    disabled={isProductLoading}
+                  >
                     Filter
                     <GitPullRequestDraft />
                   </Button>
@@ -244,13 +227,18 @@ export default function ProductsClientPage({
                       selectedTags: tags,
                       onSelectTag: handleTagChange,
                     }}
+                    disabled={isProductLoading}
                   />
                 </SheetContent>
               </Sheet>
             </div>
             <div className="flex items-center gap-2 flex-1">
               <p className="text-neutral-400 font-medium">Sort by: </p>
-              <Select defaultValue={sortBy} onValueChange={handleSortByChange}>
+              <Select
+                defaultValue={sortBy}
+                onValueChange={handleSortByChange}
+                disabled={isProductLoading}
+              >
                 <SelectTrigger className="min-w-[120px]">
                   <SelectValue placeholder="Select your veggie" />
                 </SelectTrigger>
@@ -272,30 +260,45 @@ export default function ProductsClientPage({
               </h4>
             </div>
           </div>
-          <Suspense
-            fallback={
-              <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
-                {[...Array(6)].map((_, i) => (
-                  <Skeleton
-                    key={i}
-                    className="w-full min-w-[15rem] h-64 rounded-md"
-                  />
-                ))}
-              </div>
-            }
-          >
+
+          {!isFilterHydrated || isProductLoading ? (
             <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
-              {products.map((product, index) => (
-                <div key={index} className="w-full min-w-[15rem] max-w-[0rem]">
-                  <ProductCard
-                    product={{ ...product, unit: '500mg' }}
-                    onStoreCart={handleAddProductToCart}
-                    direction="column"
-                  />
-                </div>
+              {[...Array(6)].map((_, i) => (
+                <Skeleton
+                  key={i}
+                  className="w-full min-w-[15rem] h-64 rounded-md"
+                />
               ))}
             </div>
-          </Suspense>
+          ) : (
+            <Suspense
+              fallback={
+                <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
+                  {[...Array(6)].map((_, i) => (
+                    <Skeleton
+                      key={i}
+                      className="w-full min-w-[15rem] h-64 rounded-md"
+                    />
+                  ))}
+                </div>
+              }
+            >
+              <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
+                {products.map((product, index) => (
+                  <div
+                    key={index}
+                    className="w-full min-w-[15rem] max-w-[0rem]"
+                  >
+                    <ProductCard
+                      product={{ ...product, unit: '500mg' }}
+                      onStoreCart={handleAddProductToCart}
+                      direction="column"
+                    />
+                  </div>
+                ))}
+              </div>
+            </Suspense>
+          )}
         </div>
       </div>
 

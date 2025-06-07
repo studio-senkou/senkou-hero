@@ -43,7 +43,7 @@ export const useProductFilter = create<ProductFilterStore>()(
       categories: [],
       price: {
         min: 0,
-        max: 100,
+        max: 0,
       },
       tags: [],
       setCategories: (categories: Array<string>) => set({ categories }),

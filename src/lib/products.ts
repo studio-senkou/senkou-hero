@@ -59,24 +59,24 @@ export const getProducts = async ({
     }
 
     const taggedProducts = priceRangedProducts.filter((product) => {
-      if (!product.product_tags || !product.product_tags.length) {
-        return true
-      }
+      if (!tag || !tag.length) return true
 
       if (typeof tag === 'string') {
         return product.product_tags.some(
-          (productTag) => productTag.name === tag,
+          (productTag) => productTag.tags.name === tag,
         )
       }
 
       if (Array.isArray(tag)) {
         return product.product_tags.some((productTag) =>
-          tag.includes(productTag.name),
+          tag.includes(productTag.tags.name),
         )
       }
 
       return true
     })
+
+    console.log(taggedProducts)
 
     return taggedProducts
   } catch {

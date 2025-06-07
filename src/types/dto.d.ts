@@ -41,7 +41,12 @@ export interface Product {
     category_id: string
     category: ProductCategory
   }>
-  product_tags: Array<ProductTag>
+  product_tags: Array<{
+    id: number
+    tag_id: number
+    tags: ProductTag
+    created_at: string
+  }>
 }
 
 export interface CartItem {

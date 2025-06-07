@@ -166,12 +166,14 @@ interface FilterPanelItemProps {
   category?: CategoryFilterProps
   price?: PriceFilterProps
   tag?: TagFilterProps
+  disabled?: boolean
 }
 
 export const FilterPanelItem = ({
   category,
   price,
   tag,
+  disabled,
 }: FilterPanelItemProps) => {
   return (
     <>
@@ -182,6 +184,7 @@ export const FilterPanelItem = ({
           defaultValue={category?.selectedCategory}
           className="mt-4"
           onValueChange={category?.onCategoryChange}
+          disabled={disabled}
         >
           {category?.categories.map((category, idx) => (
             <div
@@ -191,6 +194,7 @@ export const FilterPanelItem = ({
               <RadioGroupItem
                 value={category.category_name}
                 id={`category-${category.category_id}`}
+                disabled={disabled}
               />
               <Label
                 htmlFor={`category-${category.category_id}`}
@@ -211,7 +215,7 @@ export const FilterPanelItem = ({
 
         <RangeSlider
           min={price?.originalMinPrice ?? price?.minPrice ?? 0}
-          max={price?.originalMaxPrice ?? price?.maxPrice ?? 100}
+          max={price?.originalMaxPrice ?? price?.maxPrice ?? 0}
           step={1}
           values={[
             price?.minPrice ?? price?.originalMinPrice ?? 0,
@@ -250,6 +254,7 @@ export const FilterPanelItem = ({
                     : 'hover:bg-neutral-100',
                 )}
                 onClick={() => tag.onSelectTag(t.name)}
+                disabled={disabled}
               >
                 {t.name}
                 {isSelected && <X className="ml-2" />}
