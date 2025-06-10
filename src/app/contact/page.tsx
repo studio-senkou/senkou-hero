@@ -27,7 +27,7 @@ export default function Contact() {
               height={48}
             />
             <p className="mt-4 text-base md:text-lg text-gray-700 text-center">
-              Hero@gmail.com
+              {process.env.NEXT_PUBLIC_EMAIL}
             </p>
           </div>
           <hr className="border-t border-neutral-200 w-full" />
@@ -39,7 +39,11 @@ export default function Contact() {
               height={48}
             />
             <div className="flex flex-col gap-1 items-center mt-4">
-              <p className="text-base md:text-lg text-center">(219) 555-0114</p>
+              <p className="text-base md:text-lg text-center">
+                {process.env.NEXT_PUBLIC_PHONE_NUMBER
+                  ? `+678 ${process.env.NEXT_PUBLIC_PHONE_NUMBER.replace(/^(\+?678)?/, '').replace(/(\d{3})(\d{3,})/, '$1 $2')}`
+                  : ''}
+              </p>
               <p className="text-base md:text-lg text-center">
                 Monday - Friday
               </p>
