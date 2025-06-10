@@ -1,8 +1,6 @@
 import { Footer } from '@hero/components/footer'
-import { Button } from '@hero/components/ui/button'
-import { Input } from '@hero/components/ui/input'
 import { Navbar } from '@hero/components/ui/navbar'
-import { Textarea } from '@hero/components/ui/textarea'
+import { ContactForm } from '@hero/components/contact-form'
 import Image from 'next/image'
 
 export default function Contact() {
@@ -50,31 +48,8 @@ export default function Contact() {
               </p>
             </div>
           </div>
-        </div>
-        <form className="flex flex-col gap-4 justify-start flex-3 w-full p-4 md:p-8 shadow-sm rounded-xl bg-white h-full">
-          <div className="flex flex-col md:flex-row gap-4">
-            <Input
-              placeholder="Type your full name here..."
-              className="w-full p-6"
-            />
-            <Input
-              placeholder="Type your email here..."
-              className="w-full p-6"
-            />
-          </div>
-          <Input
-            placeholder="Write your message here..."
-            className="w-full p-6"
-          />
-          <Textarea
-            placeholder="Write your description here..."
-            className="w-full p-6"
-            rows={4}
-          />
-          <Button className="max-w-fit rounded-full bg-[#00B207]">
-            Send Message
-          </Button>
-        </form>
+        </div>{' '}
+        <ContactForm />
       </div>
       <Footer />
     </main>
