@@ -92,6 +92,8 @@ export const Testimonials = ({
         'flex flex-col items-center justify-center w-full lg:p-8 overflow-x-hidden',
         className,
       )}
+      id="testimonials"
+      aria-label="Client Testimonials"
       {...props}
     >
       <h2 className="text-3xl font-bold mb-4 text-[#002603]">
@@ -152,9 +154,11 @@ export const Testimonials = ({
 }
 
 const TestimonyCard = ({ testimony, client }: Readonly<Testimony>) => {
+  const isAnonymous = !client || !client.client_name
+
   return (
-    <div className="flex flex-col items-center justify-center p-4 min-w-sm max-w-sm lg:min-w-lg lg:max-w-lg">
-      <div className="flex flex-col items-center gap-4 border w-full border-neutral-200 p-6 rounded-lg">
+    <div className="flex flex-col items-center justify-between p-4 min-w-sm max-w-sm lg:min-w-lg lg:max-w-lg min-h-[320px]">
+      <div className="flex flex-col items-center gap-4 border w-full border-neutral-200 p-6 rounded-lg min-h-[180px] justify-center">
         <Image
           src="/quote.svg"
           alt="Quote Icon"
@@ -162,28 +166,39 @@ const TestimonyCard = ({ testimony, client }: Readonly<Testimony>) => {
           height={36}
           loading="lazy"
         />
-        <q>{testimony}</q>
+        <q className="text-center">{testimony}</q>
       </div>
       <div className="flex flex-col items-center gap-4 mt-4">
         <div className="w-[72px] h-[72px] relative">
-          <Image
-            src={
-              client.client_image
-                ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${client.client_image}`
-                : 'https://placehold.in/200.webp'
-            }
-            alt={client.client_name}
-            fill
-            className="rounded-full object-cover"
-            loading="lazy"
-            sizes="72px"
-          />
+          {!isAnonymous && client.client_image ? (
+            <Image
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${client.client_image}`}
+              alt={client.client_name}
+              fill
+              className="rounded-full object-cover"
+              loading="lazy"
+              sizes="72px"
+            />
+          ) : (
+            <Image
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                isAnonymous ? 'Anonymous' : client.client_name,
+              )}&rounded=true&background=random`}
+              alt={isAnonymous ? 'Anonymous' : client.client_name}
+              width={72}
+              height={72}
+              className="rounded-full object-cover"
+              loading="lazy"
+            />
+          )}
         </div>
         <div className="flex flex-col items-center">
           <h3 className="text-lg font-semibold text-[#002603]">
-            {client.client_name}
+            {isAnonymous ? 'Anonymous' : client.client_name}
           </h3>
-          <p className="text-sm text-gray-500">{client.organization_name}</p>
+          {!isAnonymous && client.organization_name && (
+            <p className="text-sm text-gray-500">{client.organization_name}</p>
+          )}
         </div>
       </div>
     </div>

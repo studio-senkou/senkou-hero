@@ -15,7 +15,10 @@ export const Services = ({
       {...props}
     >
       {SERVICES.map((service, index) => (
-        <div className="flex items-center w-full sm:w-64 lg:w-auto" key={index}>
+        <div
+          className="flex items-center justify-center w-full sm:w-64 lg:w-auto"
+          key={index}
+        >
           <Image
             src={service.iconPath}
             alt={service.title}

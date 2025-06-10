@@ -22,23 +22,38 @@ export const Partners = ({ className, partners, ...props }: PartnerProps) => {
           <Skeleton key={i} className="w-[100px] h-[100px] rounded-full" />
         ))}
       >
-        {partners.map((partner, index) => (
-          <div key={index} className="flex items-center cursor-pointer">
-            <div className="transition-all duration-300 filter grayscale hover:grayscale-0">
-              <Image
-                src={
-                  partner.organization_image &&
-                  process.env.NEXT_PUBLIC_SUPABASE_S3
-                    ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${partner.organization_image}`
-                    : 'https://placehold.in/200.webp'
-                }
-                alt={partner.organization_name ?? 'Client Logo'}
-                width={100}
-                height={100}
-              />
+        {partners.map((partner, index) => {
+          if (!partner.organization_image && !partner.organization_name) {
+            return null
+          }
+
+          return (
+            <div key={index} className="flex items-center cursor-pointer">
+              <div className="transition-all duration-300 filter grayscale hover:grayscale-0 w-[100px] h-[100px] flex items-center justify-center rounded-full bg-white">
+                {partner.organization_image &&
+                process.env.NEXT_PUBLIC_SUPABASE_S3 ? (
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${partner.organization_image}`}
+                    alt={
+                      partner.organization_name ??
+                      partner.client_name ??
+                      'Client Logo'
+                    }
+                    width={100}
+                    height={100}
+                    className="transition-all duration-300 filter grayscale hover:grayscale-0"
+                  />
+                ) : (
+                  partner.organization_name && (
+                    <span className="text-center text-[#00B307] text-2xl font-semibold px-2 transition-all duration-300 filter grayscale hover:grayscale-0">
+                      {partner.organization_name}
+                    </span>
+                  )
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </Suspense>
     </div>
   )

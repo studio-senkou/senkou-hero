@@ -24,7 +24,7 @@ export default async function Home() {
       <Navbar />
       <div className="mt-24">
         <LandingJumbotron />
-        <Services className="mt-8 lg:max-w-3/5 lg:relative lg:top-1/2 lg:left-1/2 lg:-translate-1/2 lg:shadow-lg lg:rounded-lg" />
+        <Services className="mt-8 mx-8 lg:max-w-3/5 lg:relative lg:top-1/2 lg:left-1/2 lg:-translate-1/2 lg:shadow-lg lg:rounded-lg" />
       </div>
 
       <Partners className="mt-20" partners={clients} />

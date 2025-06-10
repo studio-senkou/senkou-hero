@@ -76,8 +76,6 @@ export const getProducts = async ({
       return true
     })
 
-    console.log(taggedProducts)
-
     return taggedProducts
   } catch {
     return []
