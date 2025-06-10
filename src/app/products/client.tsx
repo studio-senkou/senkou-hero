@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from '@hero/components/ui/select'
 import { Sheet, SheetContent, SheetTrigger } from '@hero/components/ui/sheet'
-import { useCart } from '@hero/hooks/use-cart'
 import { useProductFilter } from '@hero/hooks/use-product-filter'
 import { Product, ProductCountByCategory, ProductTag } from '@hero/types/dto'
 import { GitPullRequestDraft, X } from 'lucide-react'
@@ -46,12 +45,10 @@ export default function ProductsClientPage({
   const [isProductLoading, setIsProductLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-
   const { price: currentPrice, setPrice: setCurrentPrice } = useProductFilter()
   const hydrateFilterStore = useProductFilter((s) => s.hydrate)
   const isFilterHydrated = useProductFilter((s) => s.hydrated)
   const clearFilterStore = useProductFilter((s) => s.clear)
-  const addProductToCart = useCart((state) => state.addItem)
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pendingPriceRef = useRef<{ min?: number; max?: number }>({})
 
@@ -111,20 +108,10 @@ export default function ProductsClientPage({
     pendingPriceRef.current.min = min
     debouncedPushPriceFilter()
   }
-
   const handleChangeMaxPrice = (max: number) => {
     setCurrentPrice({ max })
     pendingPriceRef.current.max = max
     debouncedPushPriceFilter()
-  }
-
-  const handleAddProductToCart = (product: Product) => {
-    addProductToCart({
-      id: product.id,
-      name: product.title,
-      price: product.price,
-      image: product.image,
-    })
   }
 
   const handleTagChange = (tag: string) => {
@@ -318,6 +305,7 @@ export default function ProductsClientPage({
               }
             >
               <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
+                {' '}
                 {products.map((product, index) => (
                   <div
                     key={index}
@@ -325,7 +313,6 @@ export default function ProductsClientPage({
                   >
                     <ProductCard
                       product={{ ...product, unit: '500mg' }}
-                      onStoreCart={handleAddProductToCart}
                       direction="column"
                     />
                   </div>

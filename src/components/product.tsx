@@ -10,26 +10,36 @@ import { cn } from '@hero/lib/utils'
 import { Product, ProductCountByCategory, ProductTag } from '@hero/types/dto'
 import { useMemo, Suspense } from 'react'
 import { Skeleton } from './ui/skeleton'
+import { useCart } from '@hero/hooks/use-cart'
 
 interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
   product: Product
   direction?: 'row' | 'column'
-  onStoreCart?: (product: Product) => void
 }
 
 export const ProductCard = ({
   product,
   direction = 'column',
-  onStoreCart,
   className,
   ...props
 }: ProductCardProps) => {
+  const addProductToCart = useCart((state) => state.addItem)
+
   const priceWithDiscount = useMemo(() => {
     if (product.discount) {
       return product.price - (product.price * product.discount) / 100
     }
     return product.price
   }, [product.price, product.discount])
+
+  const handleAddToCart = () => {
+    addProductToCart({
+      id: product.id,
+      name: product.title,
+      price: product.price,
+      image: product.image,
+    })
+  }
 
   return (
     <div
@@ -72,70 +82,83 @@ export const ProductCard = ({
             fill
           />
         </Suspense>
-      </div>
-      <div className="flex justify-between items-center gap-2">
-        <div className="flex flex-col gap-1">
+      </div>{' '}
+      <div className="flex justify-between items-start gap-2 w-full">
+        <div className="flex flex-col gap-1 flex-1">
           <h3 className="text-neutral-500 line-clamp-1">{product.title}</h3>
-          <p className="text-neutral-400">{product.unit}</p>
           <div className="flex items-end gap-2">
-            <span
-              className={cn(
-                product.discount && 'line-through',
-                'text-sm text-neutral-400',
-              )}
-            >
-              {product.price.toLocaleString('en-US', {
-                style: 'currency',
-                currency: 'USD',
-              })}
-            </span>
-            {product.discount && (
-              <span>
-                {priceWithDiscount.toLocaleString('en-US', {
+            {product.discount ? (
+              <>
+                <span
+                  className={cn(
+                    'line-through text-base font-normal text-neutral-400',
+                  )}
+                >
+                  {product.price.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                  })}
+                </span>
+                <span className="text-lg font-semibold text-neutral-600">
+                  {priceWithDiscount.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                  })}
+                </span>
+              </>
+            ) : (
+              <span className="text-lg font-semibold text-neutral-600">
+                {product.price.toLocaleString('en-US', {
                   style: 'currency',
                   currency: 'USD',
                 })}
               </span>
             )}
+            <span className="text-sm text-neutral-400">/ {product.unit}</span>
           </div>
-        </div>
-        {direction === 'column' && (
-          <Button
-            variant="ghost"
-            className="bg-neutral-100 rounded-full p-2 cursor-pointer hover:bg-neutral-200 relative overflow-visible"
-            onClick={(e) => {
-              onStoreCart?.(product)
+          {direction === 'column' && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="self-end bg-neutral-100 rounded-full p-2 cursor-pointer hover:bg-neutral-200"
+              onClick={(e) => {
+                handleAddToCart()
 
-              const img = e.currentTarget.closest('div')
-              const cartIcon = e.currentTarget
-              if (img && cartIcon) {
-                const imgRect = img.getBoundingClientRect()
-                const cartRect = cartIcon.getBoundingClientRect()
-                const clone = img.cloneNode(true) as HTMLElement
-                clone.style.position = 'fixed'
-                clone.style.left = `${imgRect.left}px`
-                clone.style.top = `${imgRect.top}px`
-                clone.style.width = `${imgRect.width}px`
-                clone.style.height = `${imgRect.height}px`
-                clone.style.transition = 'all 0.7s cubic-bezier(.4,2,.6,1)'
-                clone.style.zIndex = '9999'
-                document.body.appendChild(clone)
+                const card = e.currentTarget.closest('[id]')
+                if (!card) return
+
+                const { left, top } = card.getBoundingClientRect()
+                const text = document.createElement('div')
+                text.textContent = product.title
+                Object.assign(text.style, {
+                  position: 'fixed',
+                  left: `${left}px`,
+                  top: `${top}px`,
+                  fontSize: '1rem',
+                  background: '#fff',
+                  padding: '4px 12px',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  transition:
+                    'transform 0.4s cubic-bezier(.4,2,.6,1), opacity 0.4s',
+                  zIndex: '9999',
+                })
+                document.body.appendChild(text)
+
                 setTimeout(() => {
-                  clone.style.left = `${cartRect.left}px`
-                  clone.style.top = `${cartRect.top}px`
-                  clone.style.width = '32px'
-                  clone.style.height = '32px'
-                  clone.style.opacity = '0.5'
+                  text.style.transform = 'translateX(60px)'
+                  text.style.opacity = '0.7'
                 }, 10)
+
                 setTimeout(() => {
-                  document.body.removeChild(clone)
-                }, 800)
-              }
-            }}
-          >
-            <ShoppingBag />
-          </Button>
-        )}
+                  document.body.removeChild(text)
+                }, 450)
+              }}
+            >
+              <ShoppingBag size={16} />
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )
