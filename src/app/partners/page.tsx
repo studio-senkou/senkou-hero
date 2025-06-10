@@ -24,34 +24,42 @@ export default async function Partners() {
       </div>
 
       <div className="flex flex-wrap gap-4 mb-24 justify-center max-w-4xl w-full">
-        {partners.map((partner) => (
-          <div
-            key={partner.id}
-            className="relative flex flex-col items-center justify-center w-72 p-12 cursor-pointer mt-8 border border-neutral-200 rounded-lg group"
-          >
-            <Image
-              src={
-                partner.organization_image &&
-                process.env.NEXT_PUBLIC_SUPABASE_S3
-                  ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${partner.organization_image}`
-                  : 'https://placehold.in/150x100.webp'
-              }
-              alt={partner.organization_name ?? 'Partner Image'}
-              width={150}
-              height={100}
-              className="object-contain transition-opacity duration-300 group-hover:opacity-0"
-            />
-            <div className="absolute inset-0 flex flex-col items-start justify-center px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <h2 className="text-2xl font-semibold">
-                {partner.organization_name}
-              </h2>
-              <p className="text-sm mt-3 text-neutral-400">
-                {/* {partner.description} */}
-                Description
-              </p>
+        {partners.map((partner) =>
+          !partner.organization_name && !partner.organization_image ? null : (
+            <div
+              key={partner.id}
+              className="relative flex flex-col items-center justify-center w-72 p-12 cursor-pointer mt-8 border border-neutral-200 rounded-lg group"
+            >
+              {partner.organization_image &&
+              process.env.NEXT_PUBLIC_SUPABASE_S3 ? (
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${partner.organization_image}`}
+                  alt={
+                    partner.organization_name ??
+                    partner.client_name ??
+                    'Partner Image'
+                  }
+                  width={150}
+                  height={100}
+                  className="object-contain transition-opacity duration-300 group-hover:opacity-0"
+                />
+              ) : (
+                <div className="flex items-center justify-center w-[150px] h-[100px] bg-neutral-100 text-neutral-500 text-xl font-bold object-contain transition-opacity duration-300 group-hover:opacity-0 rounded-lg">
+                  {partner.organization_name}
+                </div>
+              )}
+              <div className="absolute inset-0 flex flex-col items-start justify-center px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <h2 className="text-2xl font-semibold">
+                  {partner.organization_name}
+                </h2>
+                <p className="text-sm mt-3 text-neutral-400">
+                  {/* {partner.description} */}
+                  Description
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          ),
+        )}
       </div>
 
       <Footer />

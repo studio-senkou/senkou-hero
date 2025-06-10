@@ -50,6 +50,7 @@ export default function ProductsClientPage({
   const { price: currentPrice, setPrice: setCurrentPrice } = useProductFilter()
   const hydrateFilterStore = useProductFilter((s) => s.hydrate)
   const isFilterHydrated = useProductFilter((s) => s.hydrated)
+  const clearFilterStore = useProductFilter((s) => s.clear)
   const addProductToCart = useCart((state) => state.addItem)
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pendingPriceRef = useRef<{ min?: number; max?: number }>({})
@@ -105,20 +106,13 @@ export default function ProductsClientPage({
       pushPriceFilterToRouter()
     }, 500)
   }
-
   const handleChangeMinPrice = (min: number) => {
-    const currentMinPrice = initialFilter?.price?.min || 0
-    if (currentMinPrice > min) return
-
     setCurrentPrice({ min })
     pendingPriceRef.current.min = min
     debouncedPushPriceFilter()
   }
 
   const handleChangeMaxPrice = (max: number) => {
-    const currentMaxPrice = initialFilter?.price?.max || 0
-    if (currentMaxPrice < max) return
-
     setCurrentPrice({ max })
     pendingPriceRef.current.max = max
     debouncedPushPriceFilter()
@@ -165,15 +159,19 @@ export default function ProductsClientPage({
 
   return (
     <div className="flex flex-col items-center justify-center w-full mt-40 overflow-hidden">
-      <Navbar />
-
+      <Navbar />{' '}
       <div className="flex w-full lg:max-w-3/4 gap-8 px-8">
         <div className="w-1/5 hidden lg:block">
           <aside>
             <Button
-              className="flex items-center px-8 py-4 cursor-pointer bg-[#00B207] text-white rounded-full"
+              className="flex items-center gap-2 px-8 py-4 cursor-pointer bg-[#00B207] text-white rounded-full"
               onClick={() => {
                 if (hasFilter) {
+                  clearFilterStore()
+                  setCurrentPrice({
+                    min: initialFilter?.price?.min || 0,
+                    max: initialFilter?.price?.max || 100,
+                  })
                   router.push('/products')
                   setTimeout(() => {
                     router.refresh()
@@ -182,10 +180,9 @@ export default function ProductsClientPage({
               }}
             >
               Filter
-              {hasFilter ? <X /> : <GitPullRequestDraft />}
+              {hasFilter ? <X size={16} /> : <GitPullRequestDraft size={16} />}
             </Button>
-
-            {!isFilterHydrated || isProductLoading ? (
+            {!isFilterHydrated ? (
               <div className="flex flex-col gap-4 mt-5">
                 <Skeleton className="w-32 h-10 rounded-md" />
                 <Skeleton className="w-full h-32 rounded-md" />
@@ -212,24 +209,21 @@ export default function ProductsClientPage({
                   selectedTags: tags,
                   onSelectTag: handleTagChange,
                 }}
-                disabled={isProductLoading}
               />
             )}
           </aside>
         </div>
         <div className="flex-1 flex flex-col">
+          {' '}
           <div className="flex gap-4 items-center w-full mb-6">
             <div className="flex items-center gap-2 lg:hidden">
               <Sheet defaultOpen={false}>
                 <SheetTrigger asChild className="inline-flex">
-                  <Button
-                    className="flex items-center px-8 py-4 bg-[#00B207] text-white rounded-full"
-                    disabled={isProductLoading}
-                  >
+                  <Button className="flex items-center gap-2 px-8 py-4 bg-[#00B207] text-white rounded-full">
                     Filter
-                    <GitPullRequestDraft />
+                    <GitPullRequestDraft size={16} />
                   </Button>
-                </SheetTrigger>
+                </SheetTrigger>{' '}
                 <SheetContent side="left" className="p-8 overflow-y-auto">
                   <FilterPanelItem
                     category={{
@@ -250,18 +244,36 @@ export default function ProductsClientPage({
                       selectedTags: tags,
                       onSelectTag: handleTagChange,
                     }}
-                    disabled={isProductLoading}
                   />
+                  <div className="absolute bottom-0 left-0 w-full p-4 bg-white">
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2 px-8 py-4 cursor-pointer border-[#00B207] text-[#00B207] hover:bg-[#00B207] hover:text-white rounded-full w-full justify-center"
+                      onClick={() => {
+                        if (hasFilter) {
+                          clearFilterStore()
+                          setCurrentPrice({
+                            min: initialFilter?.price?.min || 0,
+                            max: initialFilter?.price?.max || 100,
+                          })
+                          router.push('/products')
+                          setTimeout(() => {
+                            router.refresh()
+                          }, 500)
+                        }
+                      }}
+                      disabled={!hasFilter}
+                    >
+                      Clear Filter
+                      {hasFilter && <X size={16} />}
+                    </Button>
+                  </div>
                 </SheetContent>
               </Sheet>
             </div>
             <div className="flex items-center gap-2 flex-1">
               <p className="text-neutral-400 font-medium">Sort by: </p>
-              <Select
-                defaultValue={sortBy}
-                onValueChange={handleSortByChange}
-                disabled={isProductLoading}
-              >
+              <Select defaultValue={sortBy} onValueChange={handleSortByChange}>
                 <SelectTrigger className="min-w-[120px]">
                   <SelectValue placeholder="Latest" />
                 </SelectTrigger>
@@ -283,7 +295,6 @@ export default function ProductsClientPage({
               </h4>
             </div>
           </div>
-
           {!isFilterHydrated || isProductLoading ? (
             <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
               {[...Array(6)].map((_, i) => (
@@ -324,7 +335,6 @@ export default function ProductsClientPage({
           )}
         </div>
       </div>
-
       <Footer className="mt-24" />
     </div>
   )

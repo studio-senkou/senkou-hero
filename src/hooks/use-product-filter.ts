@@ -11,7 +11,7 @@ interface ProductFilterStore {
   hydrated: boolean
   hydrate: (
     payload: Partial<
-      StoreStateOnly<Omit<ProductFilterStore, 'hydrated' | 'hydrate'>>
+      StoreStateOnly<Omit<ProductFilterStore, 'hydrated' | 'hydrate' | 'clear'>>
     >,
   ) => void
   categories: Array<string>
@@ -23,6 +23,7 @@ interface ProductFilterStore {
   setCategories: (categories: Array<string>) => void
   setPrice: (price: { min?: number; max?: number }) => void
   setTags: (tags: Array<string>) => void
+  clear: () => void
 }
 
 export const useProductFilter = create<ProductFilterStore>()(
@@ -32,7 +33,9 @@ export const useProductFilter = create<ProductFilterStore>()(
       hydrated: false,
       hydrate: (
         payload: Partial<
-          StoreStateOnly<Omit<ProductFilterStore, 'hydrated' | 'hydrate'>>
+          StoreStateOnly<
+            Omit<ProductFilterStore, 'hydrated' | 'hydrate' | 'clear'>
+          >
         >,
       ) => {
         if (!get().hydrated) {
@@ -55,6 +58,12 @@ export const useProductFilter = create<ProductFilterStore>()(
         })
       },
       setTags: (tags: Array<string>) => set({ tags }),
+      clear: () =>
+        set({
+          categories: [],
+          price: { min: 0, max: 100 },
+          tags: [],
+        }),
     }),
     {
       name: 'product-filter-storag',

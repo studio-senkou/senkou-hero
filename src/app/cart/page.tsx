@@ -5,7 +5,7 @@ import { Navbar } from '@hero/components/ui/navbar'
 import { useCart } from '@hero/hooks/use-cart'
 import { cartColumns } from './column'
 import { DataTable } from '@hero/components/ui/data-table'
-import { CartCoupon, CartSummary } from '@hero/components/cart'
+import { CartSummary } from '@hero/components/cart'
 import { Button } from '@hero/components/ui/button'
 import { Trash } from 'lucide-react'
 import { Suspense } from 'react'
@@ -75,7 +75,7 @@ export default function Cart() {
           <div className="flex flex-col lg:flex-row w-full gap-4 mt-8">
             <div className="flex flex-col gap-4 w-full h-full max-w-none lg:max-w-4/6">
               <DataTable columns={columns} data={items} />
-              <CartCoupon className="w-full" />
+              {/* <CartCoupon className="w-full" /> */}
             </div>
             <CartSummary
               items={selectedItems}

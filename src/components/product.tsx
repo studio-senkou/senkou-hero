@@ -207,19 +207,16 @@ export const FilterPanelItem = ({
           ))}
         </RadioGroup>
       </div>
-
-      <hr className="my-4 border-b border-neutral-100" />
-
+      <hr className="my-4 border-b border-neutral-100" />{' '}
       <div>
         <h2 className="text-xl">Price</h2>
-
         <RangeSlider
-          min={price?.originalMinPrice ?? price?.minPrice ?? 0}
-          max={price?.originalMaxPrice ?? price?.maxPrice ?? 0}
+          min={price?.originalMinPrice ?? 0}
+          max={price?.originalMaxPrice ?? 100}
           step={1}
           values={[
             price?.minPrice ?? price?.originalMinPrice ?? 0,
-            price?.maxPrice ?? price?.originalMaxPrice ?? 0,
+            price?.maxPrice ?? price?.originalMaxPrice ?? 100,
           ]}
           onChange={(values) => {
             price?.setMinPrice(values[0])
@@ -234,9 +231,7 @@ export const FilterPanelItem = ({
           </span>
         </div>
       </div>
-
       <hr className="my-4 border-b border-neutral-100" />
-
       <div>
         <h2 className="text-xl">Popular Tag</h2>
 

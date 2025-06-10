@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, ShoppingCart, Menu, X } from 'lucide-react'
+import { ShoppingCart, Menu, X } from 'lucide-react'
 
 import { NAVIGATION_ITEMS } from '@hero/constants/navigation'
 import { cn } from '@hero/lib/utils'
@@ -85,7 +85,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
           <NavLinks />
         </div>
         <div className="flex items-center gap-4">
-          {['md', ''].map((bp, i) => (
+          {/* {['md', ''].map((bp, i) => (
             <span
               key={`search-${bp}-${i}`}
               className={cn(
@@ -94,7 +94,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
             >
               <Search className="w-5 h-5" />
             </span>
-          ))}
+          ))} */}
           {['md', ''].map((bp, i) => (
             <Link
               key={`cart-${bp}-${i}`}
