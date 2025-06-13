@@ -29,19 +29,19 @@ export const Partners = ({ className, partners, ...props }: PartnerProps) => {
 
           return (
             <div key={index} className="flex items-center cursor-pointer">
-              <div className="transition-all duration-300 filter grayscale hover:grayscale-0 w-[100px] h-[100px] flex items-center justify-center rounded-full bg-white">
+              <div className="transition-all duration-300 filter grayscale hover:grayscale-0 w-[150px] h-[150px] flex items-center justify-center rounded-full bg-white overflow-visible">
                 {partner.organization_image &&
                 process.env.NEXT_PUBLIC_SUPABASE_S3 ? (
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${partner.organization_image}`}
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${partner.organization_image}`.trim()}
                     alt={
                       partner.organization_name ??
                       partner.client_name ??
                       'Client Logo'
                     }
-                    width={100}
-                    height={100}
-                    className="transition-all duration-300 filter grayscale hover:grayscale-0"
+                    width={240}
+                    height={240}
+                    className="transition-all duration-300 filter grayscale hover:grayscale-0 object-cover scale-150"
                   />
                 ) : (
                   partner.organization_name && (
