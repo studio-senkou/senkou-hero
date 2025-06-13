@@ -30,7 +30,7 @@ export default async function Home() {
         <Services className="mt-8 mx-8 lg:max-w-3/5 lg:relative lg:top-1/2 lg:left-1/2 lg:-translate-1/2 lg:shadow-lg lg:rounded-lg" />
       </div>
 
-      <Partners className="mt-20" partners={clients} />
+      {clients && <Partners className="mt-20" partners={clients} />}
 
       <div className="flex flex-col items-center justify-center mt-20 w-full">
         <h2 className="text-3xl font-bold text-center mb-5">
