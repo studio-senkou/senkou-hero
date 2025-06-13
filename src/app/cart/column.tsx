@@ -57,18 +57,20 @@ export const cartColumns = ({
     header: 'Product',
     size: 200,
     cell: ({ row }) => (
-      <div className="flex items-center space-x-2">
-        <Image
-          src={
-            row.original.image
-              ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/products/${row.original.image}`
-              : 'https://placehold.in/200.webp'
-          }
-          alt={row.original.name}
-          className="rounded-md"
-          width={50}
-          height={50}
-        />
+      <div className="flex items-center space-x-3">
+        <div className="w-12 h-12 flex-shrink-0 rounded-md overflow-hidden bg-neutral-100 flex items-center justify-center">
+          <Image
+            src={
+              row.original.image
+                ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/products/${row.original.image}`
+                : 'https://placehold.in/200.webp'
+            }
+            alt={row.original.name}
+            className="object-cover w-full h-full"
+            width={48}
+            height={48}
+          />
+        </div>
         <p className="text-sm font-medium line-clamp-1">{row.original.name}</p>
       </div>
     ),

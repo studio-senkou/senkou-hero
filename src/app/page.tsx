@@ -34,8 +34,8 @@ export default async function Home({
   return (
     <div className="overflow-hidden transition-all duration-500 ease-in-out">
       <Navbar />
-      <div className="mt-24">
-        <LandingJumbotron />
+      <div>
+        <LandingJumbotron className="pt-24" />
         <Services className="mt-8 lg:max-w-3/5 lg:relative lg:top-1/2 lg:left-1/2 lg:-translate-1/2 lg:shadow-lg lg:rounded-lg" />
       </div>
       {clients && <Partners className="mt-20 lg:mt-0" partners={clients} />}
@@ -59,7 +59,11 @@ export default async function Home({
           </div>
         }
       >
-        <ProductClient products={products} categories={categories} initialCategory={params.category} />
+        <ProductClient
+          products={products}
+          categories={categories}
+          initialCategory={params.category}
+        />
       </Suspense>
 
       <div className="min-w-screen bg-[#F0F5F1] p-4 md:p-16 mt-20">

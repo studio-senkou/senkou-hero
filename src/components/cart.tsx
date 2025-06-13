@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetTrigger } from './ui/sheet'
 import Image from 'next/image'
 import { toast } from 'sonner'
 import { Skeleton } from './ui/skeleton'
+import { getSupabaseAsset } from '@hero/utils/asset'
 
 interface CartSummaryProps {
   items: Array<CartItem>
@@ -53,7 +54,7 @@ export const CartSummary = ({ items = [], onCheckout }: CartSummaryProps) => {
       <div className="flex flex-col gap-4 mt-4 text-sm text-neutral-600">
         <div className="flex justify-between items-center">
           <p>Total Item</p>
-          <span>{`(${items.length})`}</span>
+          <span>{`(${items.reduce((acc, item) => acc + item.quantity, 0)})`}</span>
         </div>
         <hr />
         <div className="flex justify-between items-center">
@@ -105,19 +106,20 @@ export const CartSummary = ({ items = [], onCheckout }: CartSummaryProps) => {
                     className="flex items-center justify-between mb-4"
                   >
                     <div className="flex items-center">
-                      <Image
-                        src={
-                          item.image
-                            ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/products/${item.image}`
-                            : 'https://placehold.in/200.webp'
-                        }
-                        alt={item.name}
-                        width={50}
-                        height={50}
-                        className="rounded-md mr-4 mb-4"
-                        loading="lazy"
-                        unoptimized
-                      />
+                      <div className="w-12 h-12 flex-shrink-0 rounded-md overflow-hidden bg-neutral-100 mr-4 flex items-center justify-center">
+                        <Image
+                          src={
+                            getSupabaseAsset(`/products/${item.image}`) ??
+                            'https://placehold.in/200.webp'
+                          }
+                          alt={item.name}
+                          width={48}
+                          height={48}
+                          className="object-cover w-full h-full"
+                          loading="lazy"
+                          unoptimized
+                        />
+                      </div>
                       <div>
                         <h3 className="text-md font-medium">{item.name}</h3>
                         <p className="text-sm text-neutral-500">
@@ -146,12 +148,27 @@ export const CartSummary = ({ items = [], onCheckout }: CartSummaryProps) => {
                 <span>${total.toFixed(2)}</span>
               </div>
             </div>
-            <Button
-              className="mt-8 w-full bg-[#00B207] p-5 rounded-full cursor-pointer hover:bg-[#00b206bb] text-white font-regular transition"
-              onClick={sendToCheckout}
-            >
-              Checkout
-            </Button>
+
+            {/* Checkout with Dialog Confirmation */}
+
+            <div className="flex gap-2 mt-8">
+              <Button
+                variant="outline"
+                onClick={() => setSheetOpen(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  sendToCheckout()
+                  setSheetOpen(false)
+                }}
+                className="flex-1 bg-[#00B207] hover:bg-[#00b206bb]"
+              >
+                Confirm Order
+              </Button>
+            </div>
           </div>
         </SheetContent>
       </Sheet>

@@ -24,7 +24,7 @@ interface NavbarProps extends React.HTMLAttributes<HTMLDivElement> {
   breadcrumbLabel?: string
 }
 
-const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
+const Navbar = ({ breadcrumbLabel, className }: NavbarProps) => {
   const [hasScrolled, setHasScrolled] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
@@ -32,7 +32,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
   const cartItems = useCart((state) => state.items)
 
   useEffect(() => {
-    const handleScroll = () => setHasScrolled(window.scrollY > 48)
+    const handleScroll = () => setHasScrolled(window.scrollY > 100)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -41,38 +41,90 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
     document.body.style.overflow = sidebarOpen ? 'hidden' : ''
   }, [sidebarOpen])
 
+  const isHomepageTop = pathname === '/' && !hasScrolled
+
+  const navVariants = {
+    transparent: {
+      backgroundColor: '#F0F5F1',
+      borderBottomColor: 'transparent',
+    },
+    scrolled: {
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderBottomColor: 'rgba(229, 231, 235, 1)',
+    },
+    solid: {
+      backgroundColor: 'rgba(255, 255, 255, 1)',
+      borderBottomColor: 'rgba(229, 231, 235, 1)',
+    },
+  }
+
+  const currentVariant = isHomepageTop
+    ? 'transparent'
+    : hasScrolled
+      ? 'scrolled'
+      : 'solid'
+
   const NavLinks = ({ onClick }: { onClick?: () => void }) => (
-    <ul className="flex flex-col lg:flex-row gap-4 lg:gap-6 font-medium text-base lg:text-md">
-      {NAVIGATION_ITEMS.map((item) => (
-        <li key={item.label}>
+    <motion.ul
+      className="flex flex-col lg:flex-row gap-4 lg:gap-6 font-medium text-base lg:text-md"
+      initial={false}
+    >
+      {NAVIGATION_ITEMS.map((item, index) => (
+        <motion.li
+          key={item.label}
+          initial={false}
+          animate={{
+            color: pathname === item.href ? '#00B207' : '#374151',
+          }}
+          transition={{
+            duration: 0.4,
+            ease: [0.25, 0.46, 0.45, 0.94],
+            delay: index * 0.05,
+          }}
+        >
           <Link
             href={item.href}
-            className={cn(
-              'text-gray-800 hover:text-[#00B207] transition-colors duration-300',
-              pathname === item.href && 'text-[#00B207]',
-            )}
+            className="hover:text-[#00B207] transition-colors duration-300"
             onClick={onClick}
           >
             {item.label}
           </Link>
-        </li>
+        </motion.li>
       ))}
-    </ul>
+    </motion.ul>
   )
 
   return (
-    <nav
+    <motion.nav
       className={cn(
-        'fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-in-out bg-white',
-        hasScrolled
-          ? 'bg-white/80 backdrop-blur-md'
-          : 'border-b border-transparent bg-white',
-        pathname === '/' && hasScrolled && 'border-b border-neutral-200',
+        'fixed top-0 left-0 w-full z-50 overflow-hidden border-b-[.1px]',
         className,
       )}
-      {...props}
+      variants={navVariants}
+      initial={false}
+      animate={currentVariant}
+      transition={{
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      }}
+      style={{
+        backdropFilter: hasScrolled && !isHomepageTop ? 'blur(12px)' : 'none',
+      }}
     >
-      <div className="flex justify-between items-center lg:max-w-3/4 mx-auto p-6">
+      <AnimatePresence>
+        {isHomepageTop && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="absolute inset-0 bg-[#F0F5F1]"
+            style={{ zIndex: -1 }}
+          />
+        )}
+      </AnimatePresence>
+
+      <div className="relative flex justify-between items-center lg:max-w-3/4 mx-auto p-6">
         <Link href="/">
           <Image
             src="/hero-logo-c1.png"
@@ -85,16 +137,6 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
           <NavLinks />
         </div>
         <div className="flex items-center gap-4">
-          {/* {['md', ''].map((bp, i) => (
-            <span
-              key={`search-${bp}-${i}`}
-              className={cn(
-                bp ? `hidden ${bp}:inline-flex p-0` : `${bp}:hidden p-0`,
-              )}
-            >
-              <Search className="w-5 h-5" />
-            </span>
-          ))} */}
           {['md', ''].map((bp, i) => (
             <Link
               key={`cart-${bp}-${i}`}
@@ -104,22 +146,61 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
                 'relative items-center justify-center',
               )}
             >
-              <ShoppingCart className="w-5 h-5" />
+              <motion.div
+                initial={false}
+                animate={{
+                  color: '#374151',
+                }}
+                transition={{
+                  duration: 0.4,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <ShoppingCart className="w-5 h-5" />
+              </motion.div>
               {cartItems.length > 0 && (
-                <span className="absolute -top-2 -right-2 flex items-center justify-center h-4 w-4 rounded-full bg-red-500 text-white text-xs font-bold">
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 500,
+                    damping: 30,
+                  }}
+                  className="absolute -top-2 -right-2 flex items-center justify-center h-4 w-4 rounded-full bg-red-500 text-white text-xs font-bold"
+                >
                   {cartItems.length}
-                </span>
+                </motion.span>
               )}
             </Link>
           ))}
-          <Button
-            variant="ghost"
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Open menu"
+          <motion.div
+            initial={false}
+            animate={{
+              color: '#374151',
+            }}
+            transition={{
+              duration: 0.4,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
           >
-            <Menu />
-          </Button>
+            <Button
+              variant="ghost"
+              className="lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Menu />
+              </motion.div>
+            </Button>
+          </motion.div>
         </div>
       </div>
 
@@ -140,7 +221,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.3 }}
-              className="absolute top-0 right-0 h-full w-full bg-white shadow-lg p-6 flex flex-col gap-6"
+              className="absolute top-0 right-0 h-full w-full bg-white p-6 flex flex-col gap-6"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-4">
@@ -166,7 +247,6 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
         )}
       </AnimatePresence>
 
-      {/* Breadcrumb */}
       {pathname !== '/' && (
         <div className="py-2 px-6 bg-black text-white">
           <div className="flex items-center lg:max-w-3/4 mx-auto">
@@ -199,7 +279,7 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
           </div>
         </div>
       )}
-    </nav>
+    </motion.nav>
   )
 }
 

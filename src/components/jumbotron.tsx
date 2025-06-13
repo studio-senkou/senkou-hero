@@ -9,32 +9,29 @@ const LandingJumbotron = ({
 }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <section
-      className={cn(
-        'flex flex-col lg:flex-row gap-4 py-4 px-12 lg:max-w-4/5 mx-auto lg:min-h-[600px] bg-[#F0F5F1] rounded-lg',
-        className,
-      )}
+      className={cn('py-4 px-6 min-w-screen bg-[#F0F5F1]', className)}
       {...props}
     >
-      <div className="flex flex-col-reverse lg:flex-row w-full">
+      <div className="flex flex-col-reverse lg:flex-row w-full lg:max-w-3/4 mx-auto lg:min-h-[600px] gap-4">
         <div className="w-full lg:w-1/3 flex flex-col justify-center p-4">
-          <h6 className="uppercase text-xs font-semibold text-[#00B207]">
-            Welcome To Hero
+          <h6 className="uppercase text-xs font-semibold text-app-primary-base mb-5">
+            Best Organic Market
           </h6>
           <h1 className="text-5xl font-semibold">
-            Freshness Guaranteed, Service Unmatched
+            Freshness Guaranteed 🥬, Service Unmatched
           </h1>
           <div className="flex flex-col gap-2 mt-3">
             {/* <h3 className="text-xl">
               <span>Sale up to </span>
               <span className="font-medium text-[#FF8A00]">30% OFF</span>
             </h3> */}
-            <p className="text-xs text-[#808080]">
+            <p className="text-md text-[#808080]">
               Enjoy farm-fresh products delivered fast, with service you can
               always count on.
             </p>
           </div>
-          <Button className="flex items-center max-w-fit rounded-full bg-[#00B207] mt-5 text-md font-normal hover:bg-[#00b206bb] text-white px-4 py-2">
-            Shop Now
+          <Button className="flex items-center max-w-fit rounded-full bg-app-primary-base mt-5 text-base font-normal hover:bg-[#00b206bb] text-white px-8 py-3">
+            Order Now
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
