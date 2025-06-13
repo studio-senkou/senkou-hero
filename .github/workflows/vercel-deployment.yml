@@ -8,12 +8,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@3
+        uses: actions/checkout@v3
 
-      - name: Install vercel CLI
+      - name: Install Vercel CLI
         run: npm install -g vercel
 
       - name: Deploy to Vercel
@@ -24,15 +23,16 @@ jobs:
           vercel build --prod --token=$VERCEL_TOKEN
           vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
 
-      - name: Notify sucess deployment
+      - name: Notify success deployment
         if: success()
-        run: curl -X POST -H "Content-Type: application/json" \
-          -d '{"text": "Deployment for senkou-hero.vercel.app is successfuly completed!"}' \
-          ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+            -d '{"text": "✅ Deployment for senkou-hero.vercel.app successfully completed!"}' \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: Notify failed Deployment
+      - name: Notify failed deployment
         if: failure()
-        run: curl -X POST -H "Content-Type: application/json" \
-          -d '{"text": "Deployment for senkou-hero.vercel.app is failed!"}' \
-          ${{ secrets.SLACK_WEBHOOK_URL }}
-          
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+            -d '{"text": "❌ Deployment for senkou-hero.vercel.app failed!"}' \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
