@@ -1,18 +1,20 @@
 'use client'
 
+import { useMemo, useState, Suspense } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { ShoppingBag, X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Label } from './ui/label'
-import { RangeSlider } from './ui/range-slider'
 import { RadioGroup, RadioGroupItem } from './ui/radio-group'
+import { RangeSlider } from './ui/range-slider'
+import { Skeleton } from './ui/skeleton'
 import { cn } from '@hero/lib/utils'
 import { Product, ProductCountByCategory, ProductTag } from '@hero/types/dto'
-import { useMemo, Suspense } from 'react'
-import { Skeleton } from './ui/skeleton'
 import { useCart } from '@hero/hooks/use-cart'
 import { toast } from 'sonner'
+import { currencyFormatter } from '@hero/utils/currency'
+import { getSupabaseAsset } from '@hero/utils/asset'
 
 interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
   product: Product
@@ -57,17 +59,20 @@ export const ProductCard = ({
   return (
     <div
       className={cn(
-        'flex border border-neutral-200 rounded-md p-4 gap-4',
-        direction === 'row' ? 'flex-row' : 'flex-col',
+        'group product-card',
+        'flex border border-neutral-200 rounded-md p-4 gap-4 overflow-hidden',
+        'hover:border-neutral-300 transition-all duration-200',
+        direction === 'row' ? 'flex-row h-full' : 'flex-col',
         className,
       )}
       id={product.id}
       {...props}
     >
+      {/* Product Image */}
       <div
         className={cn(
-          'relative overflow-hidden rounded-md',
-          direction === 'column' && 'w-[200px] h-[200px]',
+          'relative overflow-hidden rounded-md flex-shrink-0',
+          direction === 'column' && 'w-full aspect-square',
           direction === 'row' && 'w-[75px] h-[75px]',
         )}
       >
@@ -76,7 +81,7 @@ export const ProductCard = ({
             <Skeleton
               className={
                 direction === 'column'
-                  ? 'w-[200px] h-[200px]'
+                  ? 'w-full aspect-square'
                   : 'w-[75px] h-[75px]'
               }
             />
@@ -84,94 +89,68 @@ export const ProductCard = ({
         >
           <Image
             src={
-              product.image && process.env.NEXT_PUBLIC_SUPABASE_S3
-                ? `${process.env.NEXT_PUBLIC_SUPABASE_S3}/products/${product.image}`
-                : 'https://placehold.in/200.webp'
+              getSupabaseAsset(`/products/${product.image}`) ??
+              'https://placehold.in/200.webp'
             }
-            alt="Product Image"
-            sizes={direction === 'column' ? '200px' : '75px'}
+            alt={product.title}
+            sizes={
+              direction === 'column'
+                ? '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+                : '75px'
+            }
             className="rounded-md object-cover"
             loading="lazy"
             fill
           />
         </Suspense>
-      </div>{' '}
-      <div className="flex justify-between items-start gap-2 w-full">
-        <div className="flex flex-col gap-1 flex-1">
-          <h3 className="text-neutral-800 line-clamp-1">{product.title}</h3>
+      </div>
+
+      {/* Product Info */}
+      <div className="flex flex-col w-full min-h-0 flex-1">
+        <div className="flex-1">
+          <h3 className="text-neutral-800 line-clamp-1 mb-2">
+            {product.title}
+          </h3>
           <div className="flex items-end gap-1">
             {product.discount ? (
               <>
-                <span
-                  className={cn(
-                    'line-through text-base font-normal text-neutral-800',
-                  )}
-                >
-                  {product.price.toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                  })}
+                <span className="line-through text-base font-normal text-neutral-800">
+                  {currencyFormatter(product.price)}
                 </span>
                 <span className="text-lg font-semibold text-neutral-600">
-                  {priceWithDiscount.toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                  })}
+                  {currencyFormatter(priceWithDiscount)}
                 </span>
               </>
             ) : (
               <span className="text-lg font-semibold text-neutral-600">
-                {product.price.toLocaleString('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                })}
+                {currencyFormatter(product.price)}
               </span>
             )}
             <span className="text-sm text-neutral-500">/ {product.unit}</span>
           </div>
-          {direction === 'column' && (
+        </div>
+
+        {/* Add to Cart Button */}
+        {direction === 'column' && (
+          <div className="mt-3 cursor-pointer">
             <Button
-              variant="ghost"
-              size="icon"
-              className="self-end bg-neutral-100 rounded-full p-2 cursor-pointer hover:bg-neutral-200"
+              className={cn(
+                'bg-app-primary-base/10 hover:bg-app-primary-base text-app-primary-base hover:text-white',
+                'w-full rounded-md py-2 px-4 flex items-center justify-center gap-2',
+                'transition-all duration-300 ease-in-out transform',
+                'border border-app-primary-base/30',
+                'hover:scale-[1.02] active:scale-[0.98]',
+              )}
               onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation()
                 handleAddToCart()
-
-                const card = e.currentTarget.closest('[id]')
-                if (!card) return
-
-                const { left, top } = card.getBoundingClientRect()
-                const text = document.createElement('div')
-                text.textContent = product.title
-                Object.assign(text.style, {
-                  position: 'fixed',
-                  left: `${left}px`,
-                  top: `${top}px`,
-                  fontSize: '1rem',
-                  background: '#fff',
-                  padding: '4px 12px',
-                  borderRadius: '8px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  transition:
-                    'transform 0.4s cubic-bezier(.4,2,.6,1), opacity 0.4s',
-                  zIndex: '9999',
-                })
-                document.body.appendChild(text)
-
-                setTimeout(() => {
-                  text.style.transform = 'translateX(60px)'
-                  text.style.opacity = '0.7'
-                }, 10)
-
-                setTimeout(() => {
-                  document.body.removeChild(text)
-                }, 450)
               }}
             >
-              <ShoppingBag size={16} />
+              <Plus size={16} />
+              Add to Cart
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -298,5 +277,89 @@ export const FilterPanelItem = ({
         </div>
       </div>
     </>
+  )
+}
+
+interface CategoryFilterComponentProps {
+  categories: Array<string>
+  selectedCategory?: string
+  onCategoryChange?: (category: string) => void
+  className?: string
+}
+
+export const CategoryFilter = ({
+  categories,
+  selectedCategory,
+  onCategoryChange,
+  className,
+  ...props
+}: CategoryFilterComponentProps) => {
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState<string | null>(null)
+
+  const handleCategoryClick = async (category: string) => {
+    setIsLoading(category)
+
+    try {
+      if (onCategoryChange) {
+        // Allow clearing filter by clicking the same category
+        onCategoryChange(category)
+      } else {
+        // Handle router navigation
+        if (category === selectedCategory) {
+          // Clear the category filter
+          await router.push('/')
+        } else {
+          await router.push('/?category=' + encodeURIComponent(category))
+        }
+      }
+    } catch (error) {
+      console.error('Navigation error:', error)
+    } finally {
+      setTimeout(() => setIsLoading(null), 200)
+    }
+  }
+
+  return (
+    <div className={cn('flex items-center gap-2 p-1', className)} {...props}>
+      {categories.map((category, index) => {
+        const isSelected = category === selectedCategory
+        const isLoadingThis = isLoading === category
+
+        return (
+          <button
+            key={`category-${index}`}
+            className={cn(
+              'group border rounded-sm px-4 py-1.5 text-sm font-medium capitalize transition-all duration-200',
+              'hover:scale-[1.02] active:scale-[0.98]',
+              'focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-app-primary-base/30',
+              isSelected
+                ? 'bg-app-primary-base border-app-primary-base text-white shadow-md hover:bg-app-primary-base/90'
+                : 'border-neutral-200 text-neutral-700 bg-white hover:border-app-primary-base/40 hover:bg-app-primary-base/5 hover:text-app-primary-base',
+              isLoadingThis && 'pointer-events-none opacity-60',
+            )}
+            onClick={() => handleCategoryClick(category)}
+            disabled={isLoading !== null}
+            title={
+              isSelected ? `Clear ${category} filter` : `Filter by ${category}`
+            }
+          >
+            {isLoadingThis ? (
+              <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <span className="flex items-center gap-1.5">
+                {category}
+                {isSelected && (
+                  <X
+                    size={14}
+                    className="opacity-75 group-hover:opacity-100 transition-opacity duration-200"
+                  />
+                )}
+              </span>
+            )}
+          </button>
+        )
+      })}
+    </div>
   )
 }

@@ -1,24 +1,34 @@
+import Image from 'next/image'
+import Link from 'next/link'
+import { Suspense } from 'react'
+
 import { Footer } from '@hero/components/footer'
+import { LandingJumbotron } from '@hero/components/jumbotron'
 import { Partners } from '@hero/components/partners'
 import { Services } from '@hero/components/services'
 import { Testimonials } from '@hero/components/testimonials'
-import { LandingJumbotron } from '@hero/components/jumbotron'
 import { Navbar } from '@hero/components/ui/navbar'
-import { ArrowRight, Check } from 'lucide-react'
-import Image from 'next/image'
-import { ProductCard } from '@hero/components/product'
-import { getProducts } from '@hero/lib/products'
-import { getClients, getClientsTestimony } from '@hero/lib/clients'
-import { Suspense } from 'react'
 import { Skeleton } from '@hero/components/ui/skeleton'
-import Link from 'next/link'
+import { ProductClient } from './product-client'
+
+import { getClients, getClientsTestimony } from '@hero/lib/clients'
+import { getProductCountByCategories, getProducts } from '@hero/lib/products'
+
+import { ArrowRight, Check } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 60
 
-export default async function Home() {
-  const products = await getProducts()
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | undefined }>
+}) {
+  const params = await searchParams
+
+  const products = await getProducts({ category: params.category })
   const clients = await getClients(5)
+  const categories = await getProductCountByCategories()
   const testimonials = await getClientsTestimony()
 
   return (
@@ -26,74 +36,31 @@ export default async function Home() {
       <Navbar />
       <div className="mt-24">
         <LandingJumbotron />
-        <Services className="mt-8 mx-8 lg:max-w-3/5 lg:relative lg:top-1/2 lg:left-1/2 lg:-translate-1/2 lg:shadow-lg lg:rounded-lg" />
+        <Services className="mt-8 lg:max-w-3/5 lg:relative lg:top-1/2 lg:left-1/2 lg:-translate-1/2 lg:shadow-lg lg:rounded-lg" />
       </div>
-
       {clients && <Partners className="mt-20 lg:mt-0" partners={clients} />}
 
-      <div className="flex flex-col items-center justify-center mt-20 w-full">
-        <h2 className="text-2xl font-bold text-center mb-5">
-          Featured Products
-        </h2>
-        <Suspense
-          fallback={
-            <section className="flex items-start gap-4 lg:max-w-3/4 w-full mx-auto overflow-x-auto px-4">
-              {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="w-60 h-72 rounded-md" />
-              ))}
-            </section>
-          }
-        >
-          {/* Best Selling Products */}
-          <section className="flex items-start gap-4 lg:max-w-3/4 w-full mx-auto overflow-x-auto px-4">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </section>
-        </Suspense>
-
-        {/* <Suspense
-          fallback={
-            <section className="flex flex-col sm:flex-row sm:justify-start items-stretch flex-wrap gap-4 w-full lg:max-w-3/4 mx-auto mt-8 px-4">
-              <div className="flex flex-col gap-4 flex-1 min-w-60">
-                <h3 className="text-xl font-semibold">Hot Deals</h3>
-                {[...Array(3)].map((_, i) => (
-                  <Skeleton key={i} className="w-full h-24 rounded-md mb-2" />
-                ))}
-              </div>
-              <div className="flex flex-col gap-4 flex-1 min-w-60">
-                <h3 className="text-xl font-semibold">Hot Deals</h3>
-                {[...Array(3)].map((_, i) => (
-                  <Skeleton key={i} className="w-full h-24 rounded-md mb-2" />
-                ))}
-              </div>
-            </section>
-          }
-        >
-          <section className="flex flex-col sm:flex-row sm:justify-start items-stretch flex-wrap gap-4 w-full lg:max-w-3/4 mx-auto mt-8 px-4">
-            <div className="flex flex-col gap-4 flex-1 min-w-60">
-              <h3 className="text-xl font-semibold">Hot Deals</h3>
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  direction="row"
-                />
+      <Suspense
+        fallback={
+          <div className="flex flex-col items-center justify-center mt-20 w-full">
+            <h2 className="text-3xl font-bold text-center mb-5">
+              Featured Products
+            </h2>
+            <div className="flex items-center gap-3 mb-8">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="w-20 h-10 rounded-full" />
               ))}
             </div>
-            <div className="flex flex-col gap-4 flex-1 min-w-60">
-              <h3 className="text-xl font-semibold">Hot Deals</h3>
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  direction="row"
-                />
+            <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full lg:max-w-3/4 mx-auto px-4">
+              {[...Array(8)].map((_, i) => (
+                <Skeleton key={i} className="w-full h-72 rounded-md" />
               ))}
-            </div>
-          </section>
-        </Suspense> */}
-      </div>
+            </section>
+          </div>
+        }
+      >
+        <ProductClient products={products} categories={categories} initialCategory={params.category} />
+      </Suspense>
 
       <div className="min-w-screen bg-[#F0F5F1] p-4 md:p-16 mt-20">
         <div className="flex flex-col lg:flex-row justify-center items-center gap-8 max-w-6xl mx-auto">
@@ -177,7 +144,6 @@ export default async function Home() {
           </div>
         </div>
       </div>
-
       <Suspense
         fallback={
           <div className="my-20">

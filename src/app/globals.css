@@ -5,6 +5,7 @@
 
 @theme inline {
   --color-app-primary: var(--app-primary);
+  --color-app-primary-base: var(--app-primary-base);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -47,7 +48,7 @@
 
 :root {
   /* App colors */
-  --app-primary: #30ab54;
+  --app-primary-base: #30ab54;
 
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -85,7 +86,7 @@
 
 .dark {
   /* App colors */
-  --app-primary: #30ab54;
+  --app-primary-base: #30ab54;
 
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -199,4 +200,13 @@
   background: var(--normal-bg) !important;
   border-color: var(--normal-border) !important;
   color: var(--normal-text) !important;
+}
+
+/* Product card hover animation */
+.product-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
 }

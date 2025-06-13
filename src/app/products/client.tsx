@@ -267,8 +267,8 @@ export default function ProductsClientPage({
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem value="latest">Latest</SelectItem>
-                    <SelectItem value="price">Price</SelectItem>
-                    <SelectItem value="discount">Discount</SelectItem>
+                    <SelectItem value="price">Cheapest</SelectItem>
+                    {/* <SelectItem value="discount">Discount</SelectItem> */}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -283,39 +283,29 @@ export default function ProductsClientPage({
             </div>
           </div>
           {!isFilterHydrated || isProductLoading ? (
-            <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full items-start">
               {[...Array(6)].map((_, i) => (
-                <Skeleton
-                  key={i}
-                  className="w-full min-w-[15rem] h-64 rounded-md"
-                />
+                <Skeleton key={i} className="w-full h-64 rounded-md" />
               ))}
             </div>
           ) : (
             <Suspense
               fallback={
-                <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full items-start">
                   {[...Array(6)].map((_, i) => (
-                    <Skeleton
-                      key={i}
-                      className="w-full min-w-[15rem] h-64 rounded-md"
-                    />
+                    <Skeleton key={i} className="w-full h-64 rounded-md" />
                   ))}
                 </div>
               }
             >
-              <div className="flex flex-wrap items-center justify-center lg:items-start lg:justify-start gap-6 w-full">
-                {' '}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full items-start">
                 {products.map((product, index) => (
-                  <div
+                  <ProductCard
                     key={index}
-                    className="w-full min-w-[15rem] max-w-[0rem]"
-                  >
-                    <ProductCard
-                      product={{ ...product, unit: '500mg' }}
-                      direction="column"
-                    />
-                  </div>
+                    product={{ ...product, unit: '500mg' }}
+                    direction="column"
+                    className="w-full"
+                  />
                 ))}
               </div>
             </Suspense>
