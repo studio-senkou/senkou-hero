@@ -273,9 +273,9 @@ export default function ProductsClientPage({
                 </SelectContent>
               </Select>
             </div>
-            <div className="hidden lg:flex items-center gap-4 text-neutral-400">
+            <div className="hidden lg:flex items-center gap-4 text-neutral-500">
               <h4 className="text-md">
-                <span className="text-neutral-500 font-bold">
+                <span className="text-neutral-700 font-bold">
                   {products.length}
                 </span>{' '}
                 Results Found

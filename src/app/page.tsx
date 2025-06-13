@@ -32,8 +32,8 @@ export default async function Home() {
       {clients && <Partners className="mt-20 lg:mt-0" partners={clients} />}
 
       <div className="flex flex-col items-center justify-center mt-20 w-full">
-        <h2 className="text-3xl font-bold text-center mb-5">
-          Features Products
+        <h2 className="text-2xl font-bold text-center mb-5">
+          Featured Products
         </h2>
         <Suspense
           fallback={

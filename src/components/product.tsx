@@ -98,13 +98,13 @@ export const ProductCard = ({
       </div>{' '}
       <div className="flex justify-between items-start gap-2 w-full">
         <div className="flex flex-col gap-1 flex-1">
-          <h3 className="text-neutral-500 line-clamp-1">{product.title}</h3>
-          <div className="flex items-end gap-2">
+          <h3 className="text-neutral-800 line-clamp-1">{product.title}</h3>
+          <div className="flex items-end gap-1">
             {product.discount ? (
               <>
                 <span
                   className={cn(
-                    'line-through text-base font-normal text-neutral-400',
+                    'line-through text-base font-normal text-neutral-800',
                   )}
                 >
                   {product.price.toLocaleString('en-US', {
@@ -127,7 +127,7 @@ export const ProductCard = ({
                 })}
               </span>
             )}
-            <span className="text-sm text-neutral-400">/ {product.unit}</span>
+            <span className="text-sm text-neutral-500">/ {product.unit}</span>
           </div>
           {direction === 'column' && (
             <Button
