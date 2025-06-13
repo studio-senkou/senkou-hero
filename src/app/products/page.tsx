@@ -7,6 +7,7 @@ import {
 import ProductsClientPage from './client'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 export default async function ProductsPage({
   searchParams,

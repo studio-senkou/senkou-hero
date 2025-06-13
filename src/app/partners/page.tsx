@@ -3,6 +3,9 @@ import { Navbar } from '@hero/components/ui/navbar'
 import { getClients } from '@hero/lib/clients'
 import Image from 'next/image'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 60
+
 export default async function Partners() {
   const partners = await getClients()
 
