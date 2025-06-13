@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { ShoppingBag, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Label } from './ui/label'
@@ -11,6 +12,7 @@ import { Product, ProductCountByCategory, ProductTag } from '@hero/types/dto'
 import { useMemo, Suspense } from 'react'
 import { Skeleton } from './ui/skeleton'
 import { useCart } from '@hero/hooks/use-cart'
+import { toast } from 'sonner'
 
 interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
   product: Product
@@ -23,6 +25,7 @@ export const ProductCard = ({
   className,
   ...props
 }: ProductCardProps) => {
+  const router = useRouter()
   const addProductToCart = useCart((state) => state.addItem)
 
   const priceWithDiscount = useMemo(() => {
@@ -38,6 +41,16 @@ export const ProductCard = ({
       name: product.title,
       price: product.price,
       image: product.image,
+    })
+
+    toast.success(`${product.title} added to cart`, {
+      icon: null,
+      duration: 5000,
+      description: 'You can view your cart to proceed with checkout.',
+      action: {
+        label: 'View Cart',
+        onClick: () => router.push('/cart'),
+      },
     })
   }
 
@@ -121,7 +134,7 @@ export const ProductCard = ({
               variant="ghost"
               size="icon"
               className="self-end bg-neutral-100 rounded-full p-2 cursor-pointer hover:bg-neutral-200"
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                 handleAddToCart()
 
                 const card = e.currentTarget.closest('[id]')

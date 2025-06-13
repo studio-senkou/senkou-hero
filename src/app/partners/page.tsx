@@ -47,7 +47,7 @@ export default async function Partners() {
                   className="object-contain transition-opacity duration-300 group-hover:opacity-0"
                 />
               ) : (
-                <div className="flex items-center justify-center w-[150px] h-[100px] bg-neutral-100 text-neutral-500 text-xl font-bold object-contain transition-opacity duration-300 group-hover:opacity-0 rounded-lg">
+                <div className="flex items-center justify-center w-[150px] h-[100px]  text-neutral-800 text-3xl text-center font-bold object-contain transition-opacity duration-300 group-hover:opacity-0 rounded-lg">
                   {partner.organization_name}
                 </div>
               )}

@@ -60,13 +60,6 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
     </ul>
   )
 
-  const Brand =
-    pathname === '/' ? (
-      <Image src="/hero-logo-c1.png" alt="Hero Logo" width={64} height={12} />
-    ) : (
-      <h1 className="text-2xl font-medium">Hero</h1>
-    )
-
   return (
     <nav
       className={cn(
@@ -80,7 +73,14 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
       {...props}
     >
       <div className="flex justify-between items-center lg:max-w-3/4 mx-auto p-6">
-        <div>{Brand}</div>
+        <Link href="/">
+          <Image
+            src="/hero-logo-c1.png"
+            alt="Hero Logo"
+            width={64}
+            height={12}
+          />
+        </Link>
         <div className="hidden lg:flex items-center gap-6">
           <NavLinks />
         </div>
@@ -144,7 +144,14 @@ const Navbar = ({ breadcrumbLabel, className, ...props }: NavbarProps) => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-4">
-                {Brand}
+                <Link href="/">
+                  <Image
+                    src="/hero-logo-c1.png"
+                    alt="Hero Logo"
+                    width={64}
+                    height={12}
+                  />
+                </Link>
                 <Button
                   variant="ghost"
                   onClick={() => setSidebarOpen(false)}

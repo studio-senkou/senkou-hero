@@ -4,6 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-app-primary: var(--app-primary);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-poppins);
@@ -44,6 +46,9 @@
 }
 
 :root {
+  /* App colors */
+  --app-primary: #30ab54;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -79,6 +84,9 @@
 }
 
 .dark {
+  /* App colors */
+  --app-primary: #30ab54;
+
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -142,4 +150,53 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Force Sonner toast to always use light theme */
+[data-sonner-toast] {
+  --normal-bg: #ffffff !important;
+  --normal-border: #e5e7eb !important;
+  --normal-text: #111827 !important;
+  --success-bg: #f0fdf4 !important;
+  --success-border: #bbf7d0 !important;
+  --success-text: #166534 !important;
+  --error-bg: #fef2f2 !important;
+  --error-border: #fecaca !important;
+  --error-text: #991b1b !important;
+  --warning-bg: #fffbeb !important;
+  --warning-border: #fed7aa !important;
+  --warning-text: #92400e !important;
+  --info-bg: #eff6ff !important;
+  --info-border: #bfdbfe !important;
+  --info-text: #1e40af !important;
+}
+
+[data-sonner-toast][data-type='success'] {
+  background: var(--success-bg) !important;
+  border-color: var(--success-border) !important;
+  color: var(--success-text) !important;
+}
+
+[data-sonner-toast][data-type='error'] {
+  background: var(--error-bg) !important;
+  border-color: var(--error-border) !important;
+  color: var(--error-text) !important;
+}
+
+[data-sonner-toast][data-type='warning'] {
+  background: var(--warning-bg) !important;
+  border-color: var(--warning-border) !important;
+  color: var(--warning-text) !important;
+}
+
+[data-sonner-toast][data-type='info'] {
+  background: var(--info-bg) !important;
+  border-color: var(--info-border) !important;
+  color: var(--info-text) !important;
+}
+
+[data-sonner-toast]:not([data-type]) {
+  background: var(--normal-bg) !important;
+  border-color: var(--normal-border) !important;
+  color: var(--normal-text) !important;
 }

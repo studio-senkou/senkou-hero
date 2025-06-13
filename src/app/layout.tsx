@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Poppins, Urbanist } from 'next/font/google'
-import { Toaster } from 'sonner'
+import { Toaster } from '@hero/components/ui/sonner'
 import './globals.css'
 
 const poppins = Poppins({

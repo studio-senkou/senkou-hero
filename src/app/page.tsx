@@ -7,7 +7,7 @@ import { Navbar } from '@hero/components/ui/navbar'
 import { ArrowRight, Check } from 'lucide-react'
 import Image from 'next/image'
 import { ProductCard } from '@hero/components/product'
-import { getBestSellingProducts, getProducts } from '@hero/lib/products'
+import { getProducts } from '@hero/lib/products'
 import { getClients, getClientsTestimony } from '@hero/lib/clients'
 import { Suspense } from 'react'
 import { Skeleton } from '@hero/components/ui/skeleton'
@@ -19,7 +19,6 @@ export const revalidate = 60
 export default async function Home() {
   const products = await getProducts()
   const clients = await getClients(5)
-  const bestSellingProducts = await getBestSellingProducts()
   const testimonials = await getClientsTestimony()
 
   return (
@@ -47,13 +46,13 @@ export default async function Home() {
         >
           {/* Best Selling Products */}
           <section className="flex items-start gap-4 lg:max-w-3/4 w-full mx-auto overflow-x-auto px-4">
-            {bestSellingProducts.map((product) => (
+            {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </section>
         </Suspense>
 
-        <Suspense
+        {/* <Suspense
           fallback={
             <section className="flex flex-col sm:flex-row sm:justify-start items-stretch flex-wrap gap-4 w-full lg:max-w-3/4 mx-auto mt-8 px-4">
               <div className="flex flex-col gap-4 flex-1 min-w-60">
@@ -71,7 +70,6 @@ export default async function Home() {
             </section>
           }
         >
-          {/* All Products */}
           <section className="flex flex-col sm:flex-row sm:justify-start items-stretch flex-wrap gap-4 w-full lg:max-w-3/4 mx-auto mt-8 px-4">
             <div className="flex flex-col gap-4 flex-1 min-w-60">
               <h3 className="text-xl font-semibold">Hot Deals</h3>
@@ -94,7 +92,7 @@ export default async function Home() {
               ))}
             </div>
           </section>
-        </Suspense>
+        </Suspense> */}
       </div>
 
       <div className="min-w-screen bg-[#F0F5F1] p-4 md:p-16 mt-20">
