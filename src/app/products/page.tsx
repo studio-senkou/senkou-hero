@@ -15,8 +15,10 @@ export default async function ProductsPage({
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
   const params = await searchParams
+  const currentPage = parseInt(params.page || '1', 10)
+  const pageSize = parseInt(params.pageSize || '10', 10)
 
-  const products = await getProducts({
+  const productResponse = await getProducts({
     category: params.category,
     price: {
       min: params['price[min]'] ? parseInt(params['price[min]'] as string) : 0,
@@ -30,6 +32,8 @@ export default async function ProductsPage({
         : [params.tag]
       : [],
     sortBy: params.sort as 'latest' | 'price' | 'discount',
+    page: currentPage,
+    pageSize,
   })
   const tags = await getProductTags()
   const categories = await getProductCountByCategories()
@@ -37,7 +41,7 @@ export default async function ProductsPage({
 
   return (
     <ProductsClientPage
-      products={products}
+      products={productResponse.products}
       categories={categories}
       sortBy={params.sort!}
       tags={
@@ -47,6 +51,12 @@ export default async function ProductsPage({
             : [params.tag]
           : []
       }
+      pagination={{
+        total: productResponse.total,
+        totalPages: productResponse.totalPages,
+        currentPage: productResponse.currentPage,
+        pageSize: productResponse.pageSize,
+      }}
       filter={{
         category: params.category,
         price: productPriceRanges,

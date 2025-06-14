@@ -13,6 +13,16 @@ interface ProductParams {
   price?: ProductPriceRange
   tag?: string | Array<string>
   sortBy?: 'latest' | 'price' | 'discount'
+  page?: number
+  pageSize?: number
+}
+
+interface ProductResponse {
+  products: Array<Product>
+  total: number
+  totalPages: number
+  currentPage: number
+  pageSize: number
 }
 
 export const getProducts = async ({
@@ -20,7 +30,9 @@ export const getProducts = async ({
   price,
   tag,
   sortBy = 'latest',
-}: ProductParams = {}): Promise<Array<Product>> => {
+  page = 1,
+  pageSize = 12,
+}: ProductParams = {}): Promise<ProductResponse> => {
   try {
     const { data, error } = await supabase
       .from('products')
@@ -54,10 +66,6 @@ export const getProducts = async ({
         : true
     })
 
-    if (priceRangedProducts.length === 0) {
-      throw new Error('No products found in the specified price range')
-    }
-
     const taggedProducts = priceRangedProducts.filter((product) => {
       if (!tag || !tag.length) return true
 
@@ -76,9 +84,27 @@ export const getProducts = async ({
       return true
     })
 
-    return taggedProducts
+    const total = taggedProducts.length
+    const totalPages = Math.ceil(total / pageSize)
+    const startIndex = (page - 1) * pageSize
+    const endIndex = startIndex + pageSize
+    const paginatedProducts = taggedProducts.slice(startIndex, endIndex)
+
+    return {
+      products: paginatedProducts,
+      total,
+      totalPages,
+      currentPage: page,
+      pageSize,
+    }
   } catch {
-    return []
+    return {
+      products: [],
+      total: 0,
+      totalPages: 0,
+      currentPage: 1,
+      pageSize,
+    }
   }
 }
 

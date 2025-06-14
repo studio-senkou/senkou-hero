@@ -68,7 +68,6 @@ export const ProductCard = ({
       id={product.id}
       {...props}
     >
-      {/* Product Image */}
       <div
         className={cn(
           'relative overflow-hidden rounded-md flex-shrink-0',
@@ -89,8 +88,9 @@ export const ProductCard = ({
         >
           <Image
             src={
-              getSupabaseAsset(`/products/${product.image}`) ??
-              'https://placehold.in/200.webp'
+              product.image
+                ? getSupabaseAsset(`/products/${product.image}`)
+                : '/vegetable-placeholder.webp'
             }
             alt={product.title}
             sizes={

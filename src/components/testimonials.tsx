@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import type { Testimony } from '@hero/types/dto'
 import { Skeleton } from './ui/skeleton'
+import { getSupabaseAsset } from '@hero/utils/asset'
 
 interface TestimonialProps extends ComponentProps<'div'> {
   testimonials: Array<Testimony>
@@ -172,7 +173,11 @@ const TestimonyCard = ({ testimony, client }: Readonly<Testimony>) => {
         <div className="w-[72px] h-[72px] relative">
           {!isAnonymous && client.client_image ? (
             <Image
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${client.client_image}`}
+              src={
+                client.client_image
+                  ? getSupabaseAsset(`/clients/${client.client_image}`)
+                  : 'https://placehold.in/72x72.webp'
+              }
               alt={client.client_name}
               fill
               className="rounded-full object-cover"

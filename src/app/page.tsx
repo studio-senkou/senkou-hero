@@ -26,7 +26,9 @@ export default async function Home({
 }) {
   const params = await searchParams
 
-  const products = await getProducts({ category: params.category })
+  const product = await getProducts({
+    category: params.category,
+  })
   const clients = await getClients(5)
   const categories = await getProductCountByCategories()
   const testimonials = await getClientsTestimony()
@@ -60,7 +62,7 @@ export default async function Home({
         }
       >
         <ProductClient
-          products={products}
+          products={product.products}
           categories={categories}
           initialCategory={params.category}
         />

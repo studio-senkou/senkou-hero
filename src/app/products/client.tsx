@@ -15,7 +15,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@hero/components/ui/sheet'
 import { useProductFilter } from '@hero/hooks/use-product-filter'
 import { Product, ProductCountByCategory, ProductTag } from '@hero/types/dto'
-import { GitPullRequestDraft, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, GitPullRequestDraft, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState, Suspense, useMemo } from 'react'
 import { Skeleton } from '@hero/components/ui/skeleton'
@@ -25,6 +25,12 @@ interface ProductsClientPageProps {
   categories: Array<ProductCountByCategory>
   sortBy: string
   tags: Array<string>
+  pagination: {
+    total: number
+    totalPages: number
+    currentPage: number
+    pageSize: number
+  }
   filter?: {
     category?: string
     price?: {
@@ -40,11 +46,12 @@ export default function ProductsClientPage({
   categories = [],
   sortBy,
   tags = [],
+  pagination,
   filter: initialFilter,
 }: ProductsClientPageProps) {
-  const [isProductLoading, setIsProductLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
+  const [isProductLoading, setIsProductLoading] = useState(false)
   const { price: currentPrice, setPrice: setCurrentPrice } = useProductFilter()
   const hydrateFilterStore = useProductFilter((s) => s.hydrate)
   const isFilterHydrated = useProductFilter((s) => s.hydrated)
@@ -82,6 +89,8 @@ export default function ProductsClientPage({
     setIsProductLoading(true)
     const params = new URLSearchParams(searchParams.toString())
     params.set('category', categoryName)
+
+    params.set('page', '1')
     router?.push(`/products?${params.toString()}`)
   }
 
@@ -94,6 +103,8 @@ export default function ProductsClientPage({
     if (pendingPriceRef.current.max !== undefined) {
       params.set('price[max]', pendingPriceRef.current.max.toString())
     }
+
+    params.set('page', '1')
     router?.push(`/products?${params.toString()}`)
   }
 
@@ -127,6 +138,17 @@ export default function ProductsClientPage({
       params.append('tag', tag)
     }
 
+    params.set('page', '1')
+    router?.push(`/products?${params.toString()}`)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > pagination.totalPages) return
+    if (newPage === pagination.currentPage) return
+
+    setIsProductLoading(true)
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', newPage.toString())
     router?.push(`/products?${params.toString()}`)
   }
 
@@ -137,6 +159,8 @@ export default function ProductsClientPage({
     setIsProductLoading(true)
     const params = new URLSearchParams(searchParams.toString())
     params.set('sort', sortType)
+
+    params.set('page', '1')
     router?.push(`/products?${params.toString()}`)
   }
 
@@ -268,18 +292,52 @@ export default function ProductsClientPage({
                   <SelectGroup>
                     <SelectItem value="latest">Latest</SelectItem>
                     <SelectItem value="price">Cheapest</SelectItem>
-                    {/* <SelectItem value="discount">Discount</SelectItem> */}
                   </SelectGroup>
                 </SelectContent>
               </Select>
+
+              {/* <p className="text-neutral-400 font-medium ml-4">Show: </p>
+              <Select
+                defaultValue={pagination.pageSize.toString()}
+                onValueChange={handlePageSizeChange}
+              >
+                <SelectTrigger className="min-w-[80px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="8">8</SelectItem>
+                    <SelectItem value="12">12</SelectItem>
+                    <SelectItem value="24">24</SelectItem>
+                    <SelectItem value="48">48</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select> */}
             </div>
-            <div className="hidden lg:flex items-center gap-4 text-neutral-500">
-              <h4 className="text-md">
-                <span className="text-neutral-700 font-bold">
-                  {products.length}
-                </span>{' '}
-                Results Found
-              </h4>
+            <div className="flex items-center gap-4 text-neutral-500">
+              <div className="flex items-center gap-2">
+                <span className="text-app-primary-base">
+                  {products.length > 0 ? pagination.currentPage : 0}
+                </span>
+                <span>/</span>
+                <span>{pagination.totalPages}</span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    className="border border-neutral-200 bg-white text-neutral-400 hover:bg-neutral-200 rounded-full w-8 h-8 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => handlePageChange(pagination.currentPage - 1)}
+                    disabled={pagination.currentPage <= 1}
+                  >
+                    <ChevronLeft size={16} />
+                  </Button>
+                  <Button
+                    className="border border-neutral-200 bg-white text-neutral-400 hover:bg-neutral-200 rounded-full w-8 h-8 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => handlePageChange(pagination.currentPage + 1)}
+                    disabled={pagination.currentPage >= pagination.totalPages}
+                  >
+                    <ChevronRight size={16} />
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
           {!isFilterHydrated || isProductLoading ? (
@@ -302,13 +360,26 @@ export default function ProductsClientPage({
                 {products.map((product, index) => (
                   <ProductCard
                     key={index}
-                    product={{ ...product, unit: '500mg' }}
+                    product={{ ...product }}
                     direction="column"
                     className="w-full"
                   />
                 ))}
               </div>
             </Suspense>
+          )}
+          {pagination.totalPages > 1 && (
+            <div className="flex flex-col gap-4 mt-8 items-center">
+              <div className="flex items-center gap-4 text-neutral-500">
+                <div className="flex items-center gap-2">
+                  <span className="text-app-primary-base text-sm">
+                    {pagination.currentPage}
+                  </span>
+                  <span className="text-sm">/</span>
+                  <span className="text-sm">{pagination.totalPages}</span>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
