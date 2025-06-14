@@ -368,19 +368,6 @@ export default function ProductsClientPage({
               </div>
             </Suspense>
           )}
-          {pagination.totalPages > 1 && (
-            <div className="flex flex-col gap-4 mt-8 items-center">
-              <div className="flex items-center gap-4 text-neutral-500">
-                <div className="flex items-center gap-2">
-                  <span className="text-app-primary-base text-sm">
-                    {pagination.currentPage}
-                  </span>
-                  <span className="text-sm">/</span>
-                  <span className="text-sm">{pagination.totalPages}</span>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
       <Footer className="mt-24" />
