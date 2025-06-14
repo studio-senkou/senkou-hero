@@ -14,7 +14,7 @@ export default async function Partners() {
       <Navbar />
 
       <div className="w-full max-w-[90vw] md:max-w-3/4 px-4">
-        <h1 className="text-3xl md:text-4xl font-bold text-center">
+        <h1 className="text-3xl md:text-4xl font-semibold text-center">
           Hero Partner
         </h1>
         <p className="mt-4 text-base md:text-lg text-gray-700 text-center">

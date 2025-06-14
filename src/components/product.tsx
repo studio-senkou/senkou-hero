@@ -136,7 +136,7 @@ export const ProductCard = ({
             <Button
               className={cn(
                 'bg-app-primary-base/10 hover:bg-app-primary-base text-app-primary-base hover:text-white',
-                'w-full rounded-md py-2 px-4 flex items-center justify-center gap-2',
+                'w-full rounded-md py-2 px-4 flex items-center justify-center gap-2 cursor-pointer',
                 'transition-all duration-300 ease-in-out transform',
                 'border border-app-primary-base/30',
                 'hover:scale-[1.02] active:scale-[0.98]',
@@ -302,12 +302,9 @@ export const CategoryFilter = ({
 
     try {
       if (onCategoryChange) {
-        // Allow clearing filter by clicking the same category
         onCategoryChange(category)
       } else {
-        // Handle router navigation
         if (category === selectedCategory) {
-          // Clear the category filter
           await router.push('/')
         } else {
           await router.push('/?category=' + encodeURIComponent(category))
@@ -330,7 +327,7 @@ export const CategoryFilter = ({
           <button
             key={`category-${index}`}
             className={cn(
-              'group border rounded-sm px-4 py-1.5 text-sm font-medium capitalize transition-all duration-200',
+              'group border rounded-sm px-4 py-1.5 text-sm font-medium capitalize transition-all duration-200 cursor-pointer',
               'hover:scale-[1.02] active:scale-[0.98]',
               'focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-app-primary-base/30',
               isSelected

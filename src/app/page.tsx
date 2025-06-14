@@ -26,11 +26,17 @@ export default async function Home({
 }) {
   const params = await searchParams
 
+  // Get featured products based on the category from source
   const product = await getProducts({
+    featured: true,
     category: params.category,
   })
+  const categories = await getProductCountByCategories({
+    featured: true,
+  })
+
+  // Get the clients and their testimonials
   const clients = await getClients(5)
-  const categories = await getProductCountByCategories()
   const testimonials = await getClientsTestimony()
 
   return (
@@ -42,31 +48,30 @@ export default async function Home({
       </div>
       {clients && <Partners className="mt-20 lg:mt-0" partners={clients} />}
 
-      <Suspense
-        fallback={
-          <div className="flex flex-col items-center justify-center mt-20 w-full">
-            <h2 className="text-3xl font-bold text-center mb-5">
-              Featured Products
-            </h2>
-            <div className="flex items-center gap-3 mb-8">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="w-20 h-10 rounded-full" />
-              ))}
+      {categories.length > 0 && (
+        <Suspense
+          fallback={
+            <div className="flex flex-col items-center justify-center mt-20 w-full">
+              <div className="flex items-center gap-3 mb-8">
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton key={i} className="w-20 h-10 rounded-full" />
+                ))}
+              </div>
+              <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full lg:max-w-3/4 mx-auto px-4">
+                {[...Array(8)].map((_, i) => (
+                  <Skeleton key={i} className="w-full h-72 rounded-md" />
+                ))}
+              </section>
             </div>
-            <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full lg:max-w-3/4 mx-auto px-4">
-              {[...Array(8)].map((_, i) => (
-                <Skeleton key={i} className="w-full h-72 rounded-md" />
-              ))}
-            </section>
-          </div>
-        }
-      >
-        <ProductClient
-          products={product.products}
-          categories={categories}
-          initialCategory={params.category}
-        />
-      </Suspense>
+          }
+        >
+          <ProductClient
+            products={product.products}
+            categories={categories}
+            initialCategory={params.category}
+          />
+        </Suspense>
+      )}
 
       <div className="min-w-screen bg-[#F0F5F1] p-4 md:p-16 mt-20">
         <div className="flex flex-col lg:flex-row justify-center items-center gap-8 max-w-6xl mx-auto">
@@ -104,13 +109,13 @@ export default async function Home({
           </div>
 
           <div className="flex flex-col items-center lg:items-start justify-center lg:justify-start py-2 md:px-4 m-2 flex-1 min-w-0 max-w-lg">
-            <h3 className="flex flex-col text-3xl font-bold items-center lg:items-start">
+            <h3 className="flex flex-col text-3xl font-semibold items-center lg:items-start">
               <span>100% Trusted</span>
               <span>Organic Food Store</span>
             </h3>
             <div className="flex flex-col gap-6 items-center justify-center mt-8 w-full md:max-w-xl">
               <div className="flex gap-2 items-start justify-center">
-                <span className="w-6 h-6 rounded-full text-white bg-[#00B207] flex items-center justify-center mr-2 aspect-square">
+                <span className="w-6 h-6 rounded-full text-white bg-app-primary-base flex items-center justify-center mr-2 aspect-square">
                   <Check size={16} />
                 </span>
                 <div>
@@ -125,7 +130,7 @@ export default async function Home({
                 </div>
               </div>
               <div className="flex gap-2 items-start justify-center">
-                <span className="w-6 h-6 rounded-full text-white bg-[#00B207] flex items-center justify-center mr-2 aspect-square">
+                <span className="w-6 h-6 rounded-full text-white bg-app-primary-base flex items-center justify-center mr-2 aspect-square">
                   <Check size={16} />
                 </span>
                 <div>
@@ -142,7 +147,7 @@ export default async function Home({
             </div>
             <Link
               href="/products"
-              className="flex items-center max-w-fit rounded-full bg-[#00B207] mt-5 text-md font-normal hover:bg-[#00b206bb] text-white px-4 py-2"
+              className="flex items-center max-w-fit rounded-full bg-app-primary-base mt-5 text-md font-normal hover:bg-app-primary-hover text-white px-4 py-2"
             >
               Shop Now
               <ArrowRight className="ml-2 h-4 w-4" />

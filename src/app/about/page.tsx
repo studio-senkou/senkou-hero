@@ -10,7 +10,7 @@ export default function About() {
 
       <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
         <div className="flex flex-col items-start justify-center w-full md:max-w-2xl p-8">
-          <h1 className="text-4xl font-bold">
+          <h1 className="text-4xl font-semibold">
             100% Trusted Organic Food Store
           </h1>
           <p className="mt-4 text-lg text-gray-700">
@@ -54,7 +54,7 @@ export default function About() {
           />
         </div>
         <div className="flex-1 flex flex-col items-start justify-center p-8">
-          <h2 className="text-4xl font-bold">
+          <h2 className="text-4xl font-semibold">
             100% Trusted Organic Food Store
           </h2>
           <p className="mt-4 text-lg text-gray-700">
@@ -93,7 +93,7 @@ export default function About() {
       </div>
       <div className="flex flex-col md:flex-row items-start md:items-center gap-8 mt-24">
         <div className="flex flex-col items-start justify-center w-full md:max-w-2xl p-8">
-          <h1 className="text-4xl font-bold">
+          <h1 className="text-4xl font-semibold">
             100% Trusted Organic Food Store
           </h1>
           <p className="mt-4 text-lg text-gray-700">

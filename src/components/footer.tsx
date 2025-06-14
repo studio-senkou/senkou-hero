@@ -41,7 +41,7 @@ export const Footer = ({
                 shopping now!
               </p>
               <Button
-                className="bg-[#00B207] text-white rounded-full px-6 py-3 font-semibold hover:bg-[#00b206bb] transition"
+                className="bg-app-primary-base text-white rounded-full px-6 py-3 font-semibold hover:bg-app-primary-hover transition"
                 asChild
               >
                 <Link href="/products">Shop Now</Link>

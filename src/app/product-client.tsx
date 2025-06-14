@@ -57,7 +57,9 @@ export function ProductClient({
 
   return (
     <div className="flex flex-col items-center justify-center mt-20 w-full">
-      <h2 className="text-3xl font-bold text-center mb-5">Featured Products</h2>
+      <h2 className="text-3xl font-semibold text-center mb-5">
+        Featured Products
+      </h2>
 
       <CategoryFilter
         categories={[categories?.map((cat) => cat.category_name)]

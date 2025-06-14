@@ -10,6 +10,7 @@ import { supabase } from './supabase'
 
 interface ProductParams {
   category?: string
+  featured?: boolean
   price?: ProductPriceRange
   tag?: string | Array<string>
   sortBy?: 'latest' | 'price' | 'discount'
@@ -29,6 +30,7 @@ export const getProducts = async ({
   category,
   price,
   tag,
+  featured = false,
   sortBy = 'latest',
   page = 1,
   pageSize = 12,
@@ -53,9 +55,11 @@ export const getProducts = async ({
 
     const categorizedProducts = (data as unknown as Array<Product>).filter(
       (product) => {
-        return category
-          ? product.product_categories.some((c) => c.category.name === category)
-          : true
+        return product.product_categories.some(
+          (c) =>
+            (category ? c.category.name === category : true) &&
+            c.category.is_featured === featured,
+        )
       },
     )
 
@@ -156,7 +160,13 @@ export const getBestSellingProducts = async (): Promise<Array<Product>> => {
   }
 }
 
-export const getProductCountByCategories = async (): Promise<
+interface GetProductCountByCategoriesParams {
+  featured?: boolean
+}
+
+export const getProductCountByCategories = async ({
+  featured = false,
+}: GetProductCountByCategoriesParams = {}): Promise<
   Array<ProductCountByCategory>
 > => {
   try {
@@ -165,7 +175,9 @@ export const getProductCountByCategories = async (): Promise<
       throw error
     }
 
-    return data as unknown as Array<ProductCountByCategory>
+    return (data as unknown as Array<ProductCountByCategory>).filter(
+      (product) => product.is_featured === featured,
+    )
   } catch {
     return []
   }

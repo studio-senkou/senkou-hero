@@ -2,7 +2,7 @@
 
 import { cn } from '@hero/lib/utils'
 import { ComponentProps, useEffect, useRef, useState, Suspense } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, PanInfo } from 'framer-motion'
 import Image from 'next/image'
 import type { Testimony } from '@hero/types/dto'
 import { Skeleton } from './ui/skeleton'
@@ -17,9 +17,9 @@ export const Testimonials = ({
   className,
   ...props
 }: TestimonialProps) => {
-  const AUTOPLAY_INTERVAL = 10000
-
   const [isMobile, setIsMobile] = useState(false)
+
+  const AUTOPLAY_INTERVAL = 10000
 
   useEffect(() => {
     const checkMobile = () => {
@@ -38,15 +38,41 @@ export const Testimonials = ({
 
   const totalPages = Math.ceil(testimonials?.length / CARDS_PER_PAGE)
 
+  const goToNextPage = () => {
+    setDirection(currentPage === totalPages - 1 ? -1 : 1)
+    setCurrentPage(currentPage === totalPages - 1 ? 0 : currentPage + 1)
+  }
+
+  const goToPrevPage = () => {
+    setDirection(currentPage === 0 ? 1 : -1)
+    setCurrentPage(currentPage === 0 ? totalPages - 1 : currentPage - 1)
+  }
+
+  const goToPage = (pageIndex: number) => {
+    setDirection(pageIndex > currentPage ? 1 : -1)
+    setCurrentPage(pageIndex)
+  }
+  const handleDragEnd = (_: unknown, info: PanInfo) => {
+    const swipeThreshold = 50
+    const swipeVelocityThreshold = 500
+
+    if (
+      info.offset.x > swipeThreshold ||
+      info.velocity.x > swipeVelocityThreshold
+    ) {
+      goToPrevPage()
+      resetAutoplay()
+    } else if (
+      info.offset.x < -swipeThreshold ||
+      info.velocity.x < -swipeVelocityThreshold
+    ) {
+      goToNextPage()
+      resetAutoplay()
+    }
+  }
   useEffect(() => {
     intervalRef.current = setInterval(() => {
-      if (currentPage === totalPages - 1) {
-        setDirection(-1)
-        setCurrentPage(0)
-      } else {
-        setDirection(1)
-        setCurrentPage((previousPage) => previousPage + 1)
-      }
+      goToNextPage()
     }, AUTOPLAY_INTERVAL)
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
@@ -62,7 +88,6 @@ export const Testimonials = ({
     startIndex,
     startIndex + CARDS_PER_PAGE,
   )
-
   const variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 80 : -80,
@@ -87,6 +112,15 @@ export const Testimonials = ({
     }),
   }
 
+  const resetAutoplay = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = setInterval(() => {
+        goToNextPage()
+      }, AUTOPLAY_INTERVAL)
+    }
+  }
+
   return (
     <div
       className={cn(
@@ -97,9 +131,24 @@ export const Testimonials = ({
       aria-label="Client Testimonials"
       {...props}
     >
-      <h2 className="text-3xl font-bold mb-4 text-[#002603]">
+      <h2 className="text-3xl font-semibold mb-4 text-[#002603]">
         What Our Clients Say
       </h2>
+
+      <div className="flex gap-2 mt-4 mb-8">
+        {Array.from({ length: totalPages }).map((_, pageIndex) => (
+          <button
+            key={pageIndex}
+            className={`h-1 transition-all rounded-xs cursor-pointer ${pageIndex === currentPage ? 'bg-[#00B207] w-8' : 'bg-gray-300'} w-3`}
+            onClick={() => {
+              goToPage(pageIndex)
+              resetAutoplay()
+            }}
+            aria-label={`Go to testimonial page ${pageIndex + 1}`}
+          />
+        ))}
+      </div>
+
       <div className="flex flex-col items-center w-full">
         <Suspense
           fallback={
@@ -110,20 +159,22 @@ export const Testimonials = ({
             </div>
           }
         >
-          <div
-            className="w-full flex flex-row justify-center gap-6 overflow-hidden min-h-[280px]"
-            style={{ position: 'relative' }}
-          >
+          <div className="w-full flex flex-row justify-center gap-6 overflow-hidden min-h-[280px] relative">
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
                 key={currentPage}
-                className="flex flex-row gap-6 w-full justify-center"
+                className="flex flex-row gap-6 w-full justify-center cursor-grab active:cursor-grabbing"
                 custom={direction}
                 variants={variants}
                 initial="enter"
                 animate="center"
                 exit="exit"
                 transition={{ type: 'tween' }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.2}
+                onDragEnd={handleDragEnd}
+                whileDrag={{ cursor: 'grabbing' }}
                 style={{ width: '100%' }}
               >
                 {currentTestimonials.map((testimonial, testimonialIndex) => (
@@ -136,19 +187,6 @@ export const Testimonials = ({
             </AnimatePresence>
           </div>
         </Suspense>
-        <div className="flex gap-2 mt-4">
-          {Array.from({ length: totalPages }).map((_, pageIndex) => (
-            <button
-              key={pageIndex}
-              className={`h-2 transition-all rounded-lg cursor-pointer ${pageIndex === currentPage ? 'bg-[#00B207] w-8' : 'bg-gray-300'} w-3`}
-              onClick={() => {
-                setDirection(pageIndex > currentPage ? 1 : -1)
-                setCurrentPage(pageIndex)
-              }}
-              aria-label={`Go to testimonial page ${pageIndex + 1}`}
-            />
-          ))}
-        </div>
       </div>
     </div>
   )

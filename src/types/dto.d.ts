@@ -9,6 +9,7 @@ export interface ProductCategory {
   id: string
   name: string
   description: string
+  is_featured: boolean
 }
 
 export interface ProductTag {
@@ -20,6 +21,7 @@ export interface ProductTag {
 export interface ProductCountByCategory {
   category_id: string
   category_name: string
+  is_featured: boolean
   count: number
 }
 

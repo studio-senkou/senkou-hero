@@ -8,7 +8,7 @@ export default function Contact() {
     <main className="flex flex-col items-center mt-40 overflow-hidden">
       <Navbar />
       <div className="w-full max-w-[90vw] md:max-w-3/4 px-4">
-        <h1 className="text-3xl md:text-4xl font-bold text-center md:text-left">
+        <h1 className="text-3xl md:text-4xl font-semibold text-center md:text-left">
           Can’t Help Hearing from You!
         </h1>
         <p className="mt-4 text-base md:text-lg text-gray-700 text-center md:text-left">

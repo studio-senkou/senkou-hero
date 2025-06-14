@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { ComponentProps, Suspense } from 'react'
 import { Skeleton } from './ui/skeleton'
 import { Client } from '@hero/types/dto'
+import { getSupabaseAsset } from '@hero/utils/asset'
 
 interface PartnerProps extends ComponentProps<'div'> {
   partners: Array<Client>
@@ -12,7 +13,7 @@ export const Partners = ({ className, partners, ...props }: PartnerProps) => {
   return (
     <div
       className={cn(
-        'flex flex-row flex-wrap justify-center items-center gap-36',
+        'flex flex-col lg:flex-row flex-wrap justify-center items-center gap-12 lg:gap-24',
         className,
       )}
       {...props}
@@ -33,7 +34,13 @@ export const Partners = ({ className, partners, ...props }: PartnerProps) => {
                 {partner.organization_image &&
                 process.env.NEXT_PUBLIC_SUPABASE_S3 ? (
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_S3}/clients/${partner.organization_image}`.trim()}
+                    src={
+                      partner.organization_image
+                        ? getSupabaseAsset(
+                            `/clients/${partner.organization_image}`,
+                          ).trim()
+                        : ''
+                    }
                     alt={
                       partner.organization_name ??
                       partner.client_name ??
@@ -45,7 +52,7 @@ export const Partners = ({ className, partners, ...props }: PartnerProps) => {
                   />
                 ) : (
                   partner.organization_name && (
-                    <span className="text-center text-[#00B307] text-2xl font-semibold px-2 transition-all duration-300 filter grayscale hover:grayscale-0">
+                    <span className="text-center text-app-primary-base text-2xl font-semibold px-2 transition-all duration-300 filter grayscale hover:grayscale-0">
                       {partner.organization_name}
                     </span>
                   )

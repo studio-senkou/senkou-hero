@@ -74,7 +74,7 @@ const Navbar = ({ breadcrumbLabel, className }: NavbarProps) => {
           key={item.label}
           initial={false}
           animate={{
-            color: pathname === item.href ? '#00B207' : '#374151',
+            color: pathname === item.href ? '#30ab54' : '#374151',
           }}
           transition={{
             duration: 0.4,
@@ -84,7 +84,7 @@ const Navbar = ({ breadcrumbLabel, className }: NavbarProps) => {
         >
           <Link
             href={item.href}
-            className="hover:text-[#00B207] transition-colors duration-300"
+            className="hover:text-app-primary-base transition-colors duration-300"
             onClick={onClick}
           >
             {item.label}
