@@ -28,7 +28,12 @@ export const Footer = ({
       <section className="w-full p-8 bg-[#F2F2F2]">
         <div className="flex flex-col lg:flex-row justify-between items-center w-full lg:max-w-3/4 mx-auto gap-4 lg:gap-0">
           <div className="flex items-center gap-4 mb-6 lg:mb-0">
-            <Image src="/leaf-x3.svg" alt="Leaf Icon" width={36} height={36} />
+            <Image
+              src="/hero-logo-c1.png"
+              alt="Leaf Icon"
+              width={64}
+              height={64}
+            />
             <h2 className="text-3xl font-medium">Hero</h2>
           </div>
           <div className="flex flex-col lg:flex-row items-center gap-3 w-full lg:w-auto">
